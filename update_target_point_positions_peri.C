@@ -32,6 +32,8 @@ update_target_point_positions_peri(
 	double s_ramp = 0.5*(1/freq);
 	double c_amp;
 
+	static const double sigma = 0.2;
+
  ////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Find out the Lagrangian index ranges.
@@ -76,6 +78,16 @@ update_target_point_positions_peri(
 	if(current_time<s_ramp)
 	  {
 	    c_amp = current_time/s_ramp;
+	    
+	    if (actuator_top_idxs.first <= lag_idx && lag_idx < actuator_top_idxs.second)
+	      {
+		in ipos = lag_idx-actuator_top_idxs.first;
+		X_target[1] = -(0.5*pamp*c_amp)*exp(0.5*((ds-mu)/sigma)^2)
+	      }
+	    if (actuator_bot_idxs.first <= lag_idx && lag_idx < actuator_bot_idxs.second)
+	      {
+		X_target[1] = (0.5*pamp*c_amp)*exp(0.5*((ds-mu)/sigma)^2)
+	      }
 	  }
 	else
 	  {c_amp = 1;
