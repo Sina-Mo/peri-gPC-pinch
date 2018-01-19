@@ -1,0 +1,25 @@
+NOTES:
+
+input2d: file that contains all necessary grid, solver, boundary condition, etc.
+         data information for beginning an IBAMR simulation. Things you can change:
+		-periodic / specified boundary conditions
+		-time-step size
+		-end-time for simulation
+		-finest grid resolution	
+		-viscosity/density of fluid
+		-size of domain, L [-L/2,L/2]
+		-vorticity tagging
+		-what geometry (.vertex, .target, etc.) files are read in (line 88/89)
+
+main.C: main function that does the time-stepping (a lot is 'blackboxed' by 
+	other functions in the background). You will only need to change flags
+	for updating springs, target pts., or beams, otherwise nothing.
+
+Makefile: file that runs to compile the code to make the executable, i.e, call
+	make main2d
+
+update_target_point_positions.C: function that updates target point positions
+	by specifying how/where the points move to.
+
+update_target_point_positions.h: header file for the update_target_point_positions.C
+	file. You don't need to change anything in this.
