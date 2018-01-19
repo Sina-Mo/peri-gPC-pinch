@@ -21,14 +21,14 @@ DX = (1.0*L)/NFINEST                      // Cartesian mesh width (m)
 // solver parameters
 DELTA_FUNCTION      = "IB_4"              //
 START_TIME          = 0.0e0               // initial simulation time
-END_TIME            = 2.5               // final simulation time
+END_TIME            = 0.10               // final simulation time
 GROW_DT             = 2.0e0               // growth factor for timesteps
 NUM_CYCLES          = 1                   // number of cycles of fixed-point iteration
 CONVECTIVE_OP_TYPE  = "PPM"               // convective differencing discretization type
 CONVECTIVE_FORM     = "ADVECTIVE"         // how to compute the convective terms
 NORMALIZE_PRESSURE  = TRUE                // whether to explicitly force the pressure to have mean zero
 CFL_MAX             = 0.3                 // maximum CFL number
-DT = 1.0e-5                               // timestep duration (s)
+DT = 1.0e-4                               // timestep duration (s)
 ERROR_ON_DT_CHANGE  = TRUE                // whether to emit an error message if the time step size changes
 VORTICITY_TAGGING   = TRUE                // whether to tag cells for refinement based on vorticity thresholds
 TAG_BUFFER          = 2                   // size of tag buffer used by grid generation algorithm
@@ -93,20 +93,14 @@ IBMethod {                //
                 //
 IBStandardInitializer {                //
    max_levels = MAX_LEVELS                //
-   structure_names = "pperi_top_512", "pperi_bot_512", "heart_tube_512", "heart_race_512", "markers_512"                //   
-   pperi_top_512 {                //
+   structure_names = "heart_tube_1", "heart_race_1", "markers_1"                //   
+   heart_tube_1 {                //
       level_number = MAX_LEVELS - 1                //
    } //
-   pperi_bot_512 {                //
+   heart_race_1 {                //
       level_number = MAX_LEVELS - 1                //
    } //
-   heart_tube_512 {                //
-      level_number = MAX_LEVELS - 1                //
-   } //
-   heart_race_512 {                //
-      level_number = MAX_LEVELS - 1                //
-   } //
-   markers_512 {                //
+   markers_1 {                //
       level_number = MAX_LEVELS - 1                //
    } //
 } //
@@ -203,7 +197,7 @@ Main { //
 //
 // visualization dump parameters
    viz_writer = "VisIt"                //
-   viz_dump_interval = 5000        // set to zero to turn off
+   viz_dump_interval = 100        // set to zero to turn off
    viz_dump_dirname = "viz_IB2d"                //
    visit_number_procs_per_file = 1                //
 //

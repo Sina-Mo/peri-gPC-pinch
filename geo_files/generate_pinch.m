@@ -1,4 +1,4 @@
-function [diameter] = generate_pinch(N,aspect,pamp,n)
+function [diameter] = generate_pinch(N,aspect,pamp,n,plotit)
 %
 % Racetrack with periscribed pinch peristalsis
 %
@@ -9,8 +9,10 @@ function [diameter] = generate_pinch(N,aspect,pamp,n)
 %       the tube, Let, is going to stay the same.
 %   pamp = the compression ratio or percent occlusion of the tube during a
 %       beat
+%   plotit = logical indicating wish to plot geometry variables (1) or not
+%   (0 or anything else)
 %
-% Example use: [dia]=generate_pinch(512,10,0.95,1) where 512 is the grid
+% Example use: [dia]=generate_pinch(512,10,0.95,1,1) where 512 is the grid
 % size, 10 is the aspect ratio of the tube, 0.95 is the compression ratio,
 % and 1 is the run number associated with these parameter values.
 %
@@ -72,11 +74,15 @@ phase = 0;                      %initial phase of the oscillating force, where F
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if plotit == 1 
 % Initialize plotting function
-figure(1) 
-hold on
-ylim([-L/2 L/2])
-xlim([-L/2 L/2])
+    figure(1) 
+    hold on
+    ylim([-L/2 L/2])
+    xlim([-L/2 L/2])
+else
+    
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -108,10 +114,13 @@ end
 
 fclose(vertex_fid);
 
+if plotit==1
 % Plots elastic tube vertices
-plot(xtop_elastic,ytop_elastic,'r.')
-plot(xbot_elastic,ybot_elastic,'r.')
-
+    plot(xtop_elastic,ytop_elastic,'r.')
+    plot(xbot_elastic,ybot_elastic,'r.')
+else 
+    
+end
 % Write out the spring information for the elastic section
 
 spring_fid = fopen([mesh_name 'tube_' num2str(n) '.spring'], 'w');
@@ -186,8 +195,12 @@ for i=0:Nmarkersx-1,
     end
 end
 
+if plotit==1
 % Plot markers
-plot(x_mark,y_mark,'b.')
+    plot(x_mark,y_mark,'b.')
+else
+    
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -245,8 +258,12 @@ for i = Ncurve+Nstraight+ceil(Ncurve/2)+1:2*Ncurve+Nstraight,
 end
 fclose(vertex_fid);
 
+if plotit==1
 % Plots the racetrack vertices
-plot(x_race,y_race,'k.')
+    plot(x_race,y_race,'k.')
+else
+    
+end
 
 % Write out the target point information for the racetrack
 target_fid = fopen([mesh_name 'race_' num2str(n) '.target'], 'w');
@@ -317,8 +334,12 @@ end
 
 fclose(vertex_fid);
 
-plot(xtop_elastic_s2,ytop_elastic_s2,'m.')
-plot(xbot_elastic_s2,ybot_elastic_s2,'m.')
+if plotit ==1
+    plot(xtop_elastic_s2,ytop_elastic_s2,'m.')
+    plot(xbot_elastic_s2,ybot_elastic_s2,'m.')
+else
+    
+end
 
 % Vertex information State 3 (pinch at right end)
 vertex_fid = fopen([mesh_name 'tube_state3_' num2str(n) '.txt'], 'w');
@@ -328,19 +349,25 @@ vertex_fid = fopen([mesh_name 'tube_state3_' num2str(n) '.txt'], 'w');
 for i = 1:ceil(Nstraight/2)
     xtop_elastic_s3(1,i) = -Lt/2+(i-1)*ds;
     ytop_elastic_s3(1,i) = centery-R2-(diameter*pamp/2)*exp(-0.5*((xtop_elastic_s2(1,i)-mu)/sigma).^2);
-    fprintf(vertex_fid, '%1.16e %1.16e\n', xtop_elastic_s3(1,i), ytop_elastic_s3(1,i));
+    fprintf(vertex_fid, '%1.16e \t %1.16e\n', xtop_elastic_s3(1,i), ytop_elastic_s3(1,i));
 end
 
 % Bottom section, elastic tube
 for  i = 1:ceil(Nstraight/2)
     xbot_elastic_s3(1,i) = -Lt/2+(i-1)*ds;
     ybot_elastic_s3(1,i) = centery-R1+(diameter*pamp/2)*exp(-0.5*((xbot_elastic_s2(1,i)-mu)/sigma).^2);
-    fprintf(vertex_fid, '%1.16e %1.16e\n', xbot_elastic_s3(1,i), ybot_elastic_s3(1,i));
+    fprintf(vertex_fid, '%1.16e \t %1.16e\n', xbot_elastic_s3(1,i), ybot_elastic_s3(1,i));
 end
 
 fclose(vertex_fid);
 
-plot(xtop_elastic_s2,ytop_elastic_s3,'b.')
-plot(xbot_elastic_s2,ybot_elastic_s3,'b.')
+if plotit ==1
+    plot(xtop_elastic_s2,ytop_elastic_s3,'b.')
+    plot(xbot_elastic_s2,ybot_elastic_s3,'b.')
+    
+    hold off
+else
+    
+end
 
-hold off
+
