@@ -12,7 +12,7 @@ function [diameter] = generate_pinch(N,aspect,pamp,n,plotit)
 %   plotit = logical indicating wish to plot geometry variables (1) or not
 %   (0 or anything else)
 %
-% Example use: [dia]=generate_pinch(512,10,0.95,1,1) where 512 is the grid
+% Example use: [dia]=generate_pinch(512,4,0.95,1,1) where 512 is the grid
 % size, 10 is the aspect ratio of the tube, 0.95 is the compression ratio,
 % and 1 is the run number associated with these parameter values.
 %
@@ -50,8 +50,8 @@ centerx2 = 0.5*Lt;      % x-position of center of right curved secton
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Parameters for perscribed peristaslsis state changes
-sigma = 0.005;          % Determines pointiness of pinch
-mu = 0.19;              % Determines how far from the x-center the pinch starts
+sigma = 0.007;          % Determines pointiness of pinch
+mu = 0.18;              % Determines how far from the x-center the pinch starts
 %pamp = 0.8;            % Assigned by user.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -66,11 +66,9 @@ dmy = diameter/(Nmarkersy-1);       %space between markers in y-direction
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % material parameters
-kappa_spring = 30.0;               % spring constant (Newton)
-kappa_beam = 0.3;                 % beam stiffness constant (Newton m^2) %2.5e-2 works for Wo>=5
-kappa_target = kappa_spring;        % target point penalty spring constant (Newton)
-Fmag = 4.0e0;                % this is my best guess at a reasonable applied force %4.0e0 works for Wo>=5
-phase = 0;                      %initial phase of the oscillating force, where F=Fmag*phase and phase = (1+sin(2*pi*f*t-pi/2));
+kappa_spring = 200;%2.0;               % spring constant (Newton)
+kappa_beam = 0;%2e-8;                 % beam stiffness constant (Newton m^2) %2.5e-2 works for Wo>=5
+kappa_target = 20000;        % target point penalty spring constant (Newton)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -152,28 +150,45 @@ for i = ceil(Nstraight/2):Nstraight-3,
 end
 fclose(beam_fid);
 
-% Write out the target point information for the ends of the elastic tube
+
+% % Write out the target point information for the elastic tube
 target_fid = fopen([mesh_name 'tube_' num2str(n) '.target'], 'w');
+ 
+fprintf(target_fid, '%d\n', Nstraight);
 
-fprintf(target_fid, '%d\n', 4*Nend);
-
-for i = 0:Nend-1,
+for i = 0:ceil(Nstraight/2)-1
     fprintf(target_fid, '%d %1.16e\n', i, kappa_target*ds/(ds^2));
 end
 
-for i = ceil(Nstraight/2)-Nend:ceil(Nstraight/2)-1,
+for  i = ceil(Nstraight/2):Nstraight-1
     fprintf(target_fid, '%d %1.16e\n', i, kappa_target*ds/(ds^2));
 end
-
-for i = ceil(Nstraight/2):ceil(Nstraight/2)+Nend-1,
-    fprintf(target_fid, '%d %1.16e\n', i, kappa_target*ds/(ds^2));
-end
-
-for i = Nstraight-Nend:Nstraight-1,
-    fprintf(target_fid, '%d %1.16e\n', i, kappa_target*ds/(ds^2));
-end
-
 fclose(target_fid);
+
+
+% 
+% % Write out the target point information for the ends of the elastic tube
+% target_fid = fopen([mesh_name 'tube_' num2str(n) '.target'], 'w');
+% 
+% fprintf(target_fid, '%d\n', 4*Nend);
+% 
+% for i = 0:Nend-1,
+%     fprintf(target_fid, '%d %1.16e\n', i, kappa_target*ds/(ds^2));
+% end
+% 
+% for i = ceil(Nstraight/2)-Nend:ceil(Nstraight/2)-1,
+%     fprintf(target_fid, '%d %1.16e\n', i, kappa_target*ds/(ds^2));
+% end
+% 
+% for i = ceil(Nstraight/2):ceil(Nstraight/2)+Nend-1,
+%     fprintf(target_fid, '%d %1.16e\n', i, kappa_target*ds/(ds^2));
+% end
+% 
+% for i = Nstraight-Nend:Nstraight-1,
+%     fprintf(target_fid, '%d %1.16e\n', i, kappa_target*ds/(ds^2));
+% end
+% 
+% fclose(target_fid);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -313,6 +328,13 @@ for  i = 1:ceil(Nstraight/2)
 end
 
 fclose(vertex_fid);
+
+if plotit ==1
+    plot(xtop_elastic_s1,ytop_elastic_s1,'k.-')
+    plot(xbot_elastic_s1,ybot_elastic_s1,'k.-')
+else
+    
+end
 
 % Vertex information State 2 (pinch at left end)
 vertex_fid = fopen([mesh_name 'tube_state2_' num2str(n) '.txt'], 'w');

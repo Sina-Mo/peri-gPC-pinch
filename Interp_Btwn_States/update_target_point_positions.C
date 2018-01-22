@@ -9,11 +9,9 @@ void update_target_point_positions(
     const double current_time,
     const double dt)
 {
-    
     const int finest_ln = hierarchy->getFinestLevelNumber();
 
     static const int numPts = 1287; //number of points in geometry
-
 
  	//
     // Storing all the (X,Y) positions for both PHASES
@@ -51,17 +49,23 @@ void update_target_point_positions(
 
 
 
+
+
+
+
+
+
+
     //
     // Find out the Lagrangian index ranges.
     //
     //const std::pair<int,int>& lag_idxs = l_data_manager->getLagrangianStructureIndexRange(0, finest_ln);
 
-
     //
     // Get the LMesh (which we assume to be associated with the finest level of
     // the patch hierarchy).  Note that we currently need to update both "local"
     // and "ghost" node data.
-    //
+    
     Pointer<LMesh> mesh = l_data_manager->getLMesh(finest_ln);
     vector<LNode*> nodes;
     nodes.insert(nodes.end(), mesh->getLocalNodes().begin(), mesh->getLocalNodes().end());
