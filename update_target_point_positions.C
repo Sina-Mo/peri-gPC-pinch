@@ -14,6 +14,17 @@ void update_target_point_positions(
   const int finest_ln = hierarchy->getFinestLevelNumber();
 
   static const int numPts = 860;  // number of points in geometry
+  static double s_ramp = 0.05;    // time it takes to pinch or unpinch tube
+  static double pinch_time = 0.50;  // time it takes for the pinch to travel
+  static double centery = 0.0;  // Center of domain y
+  static double diameter = pf.tdiameter;  // Diameter of the tube
+  static double R2 = pf.tR2; // distance from middle of domain to inner wall
+  static double R1 = R2+diameter; // distance from middle of domain to outer wall
+  static double pamp = pf.pamp;  // percent occlusion of tube
+  static double sigma = 0.007;  // pointiness of pinch
+  static double mu = 0.18;   // how far from x-center pinch starts
+  double mu1 = 0.18; 
+
   // static const double pi = 4*atan(1);  // The number Pi
 
   //Storing the (x,y) positions in all three states
@@ -100,10 +111,46 @@ void update_target_point_positions(
       //IBTK::Vector<double,NDIM>& X_target = force_spec->getTargetPointPosition();
 
       // Tell the target points how to move: 
+       if(current_time<=s_ramp)
+	 {
+	   // X_target[0] = xP1[lag_idx] + (xP2[lag_idx]-xP1[lag_idx])*(current_time/s_ramp);
+	   // X_target[1] = yP1[lag_idx] + (yP2[lag_idx]-yP1[lag_idx])*(current_time/s_ramp);  //This works.
 
-      X_target[0] = xP1[lag_idx] + (xP2[lag_idx]-xP1[lag_idx])*(current_time/0.1);
-       X_target[1] = yP1[lag_idx] + (yP2[lag_idx]-yP1[lag_idx])*(current_time/0.1);
+	   if (lag_idx <(numPts/2))
+             {
+	       //X_target[0] = xP2[lag_idx] + (xP3[lag_idx]-xP2[lag_idx])*(current_time/s_ramp);                                                              
+	       X_target[1] = centery-R2-(current_time/s_ramp)*(diameter*pamp/2.0)*exp(-0.5*pow((X_target[0]+mu)/sigma,2.0));
+	       //X_target[1]=X_target[1]+0.00001;
+	     } else {
+	     X_target[1] = centery-R1+(current_time/s_ramp)*(diameter*pamp/2.0)*exp(-0.5*pow((X_target[0]+mu)/sigma,2.0));
+	     //X_target[1] = X_target[1]-0.00001;
+	   }
 
+	 } else if(current_time>s_ramp && current_time<=(pinch_time+s_ramp))
+	 {
+	   double mu1 = mu-2*mu*((current_time-s_ramp)/(pinch_time+s_ramp));
+	   
+	   if (lag_idx <(numPts/2))
+	     { 
+	   //X_target[0] = xP2[lag_idx] + (xP3[lag_idx]-xP2[lag_idx])*(current_time/s_ramp);
+	       X_target[1] = centery-R2-(diameter*pamp/2)*exp(-0.5*pow((X_target[0]+mu1)/sigma,2.0));
+	     } else {
+	     X_target[1] = centery-R1+(diameter*pamp/2)*exp(-0.5*pow((X_target[0]+mu1)/sigma,2.0));
+	   }
+	 } else if (current_time>(pinch_time+s_ramp) && current_time<=(2*s_ramp+pinch_time)) 
+	   {
+	   
+	     if (lag_idx <(numPts/2))
+	       {
+		 X_target[1] = centery-R2-(1-(current_time-(pinch_time+s_ramp))/s_ramp)*(diameter*pamp/2.0)*exp(-0.5*pow((X_target[0]+mu)/sigma,2.0)); 
+	       } else {
+	         X_target[1] = centery-R1+(1-(current_time-(pinch_time+s_ramp))/s_ramp)*(diameter*pamp/2.0)*exp(-0.5*pow((X_target[0]+mu)/sigma,2.0)); 
+	     }
+	   
+	   } else {
+	   }
+
+       
   } // Ends loop over target points
 
   return;
