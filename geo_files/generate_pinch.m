@@ -310,24 +310,24 @@ ybot_elastic_s3 = zeros(1,ceil(Nstraight/2));
 xbot_elastic_s3 = zeros(1,ceil(Nstraight/2));
 
 % Vertex information State 1 (straight lines)
-vertex_fid = fopen([mesh_name 'tube_state1_' num2str(n) '.txt'], 'w');
+% vertex_fid = fopen([mesh_name 'tube_state1_' num2str(n) '.txt'], 'w');
 %fprintf(vertex_fid, '%d\n', Nstraight);
 
 % Top section, elastic tube
 for i = 1:ceil(Nstraight/2)
     ytop_elastic_s1(1,i) = centery-R2;
     xtop_elastic_s1(1,i) = -Lt/2+(i-1)*ds;
-    fprintf(vertex_fid, '%1.16e %1.16e\n', xtop_elastic_s1(1,i), ytop_elastic_s1(1,i));
+%     fprintf(vertex_fid, '%1.16e %1.16e\n', xtop_elastic_s1(1,i), ytop_elastic_s1(1,i));
 end
 
 % Bottom section, elastic tube
 for  i = 1:ceil(Nstraight/2)
     ybot_elastic_s1(1,i) = centery-R1;
     xbot_elastic_s1(1,i) = -Lt/2+(i-1)*ds;
-    fprintf(vertex_fid, '%1.16e %1.16e\n', xbot_elastic_s1(1,i), ybot_elastic_s1(1,i));
+%     fprintf(vertex_fid, '%1.16e %1.16e\n', xbot_elastic_s1(1,i), ybot_elastic_s1(1,i));
 end
 
-fclose(vertex_fid);
+% fclose(vertex_fid);
 
 if plotit ==1
     plot(xtop_elastic_s1,ytop_elastic_s1,'k.-')
@@ -337,24 +337,24 @@ else
 end
 
 % Vertex information State 2 (pinch at left end)
-vertex_fid = fopen([mesh_name 'tube_state2_' num2str(n) '.txt'], 'w');
+% vertex_fid = fopen([mesh_name 'tube_state2_' num2str(n) '.txt'], 'w');
 %fprintf(vertex_fid, '%d\n', Nstraight);
 
 % Top section, elastic tube
 for i = 1:ceil(Nstraight/2)
     xtop_elastic_s2(1,i) = -Lt/2+(i-1)*ds;
     ytop_elastic_s2(1,i) = centery-R2-(diameter*pamp/2)*exp(-0.5*((xtop_elastic_s2(1,i)+mu)/sigma).^2);
-    fprintf(vertex_fid, '%1.16e %1.16e\n', xtop_elastic_s2(1,i), ytop_elastic_s2(1,i));
+%     fprintf(vertex_fid, '%1.16e %1.16e\n', xtop_elastic_s2(1,i), ytop_elastic_s2(1,i));
 end
 
 % Bottom section, elastic tube
 for  i = 1:ceil(Nstraight/2)
     xbot_elastic_s2(1,i) = -Lt/2+(i-1)*ds;
     ybot_elastic_s2(1,i) = centery-R1+(diameter*pamp/2)*exp(-0.5*((xbot_elastic_s2(1,i)+mu)/sigma).^2);
-    fprintf(vertex_fid, '%1.16e %1.16e\n', xbot_elastic_s2(1,i), ybot_elastic_s2(1,i));
+%     fprintf(vertex_fid, '%1.16e %1.16e\n', xbot_elastic_s2(1,i), ybot_elastic_s2(1,i));
 end
 
-fclose(vertex_fid);
+% fclose(vertex_fid);
 
 if plotit ==1
     plot(xtop_elastic_s2,ytop_elastic_s2,'m.')
@@ -364,24 +364,24 @@ else
 end
 
 % Vertex information State 3 (pinch at right end)
-vertex_fid = fopen([mesh_name 'tube_state3_' num2str(n) '.txt'], 'w');
+% vertex_fid = fopen([mesh_name 'tube_state3_' num2str(n) '.txt'], 'w');
 %fprintf(vertex_fid, '%d\n', Nstraight);
 
 % Top section, elastic tube
 for i = 1:ceil(Nstraight/2)
     xtop_elastic_s3(1,i) = -Lt/2+(i-1)*ds;
     ytop_elastic_s3(1,i) = centery-R2-(diameter*pamp/2)*exp(-0.5*((xtop_elastic_s2(1,i)-mu)/sigma).^2);
-    fprintf(vertex_fid, '%1.16e \t %1.16e\n', xtop_elastic_s3(1,i), ytop_elastic_s3(1,i));
+%     fprintf(vertex_fid, '%1.16e \t %1.16e\n', xtop_elastic_s3(1,i), ytop_elastic_s3(1,i));
 end
 
 % Bottom section, elastic tube
 for  i = 1:ceil(Nstraight/2)
     xbot_elastic_s3(1,i) = -Lt/2+(i-1)*ds;
     ybot_elastic_s3(1,i) = centery-R1+(diameter*pamp/2)*exp(-0.5*((xbot_elastic_s2(1,i)-mu)/sigma).^2);
-    fprintf(vertex_fid, '%1.16e \t %1.16e\n', xbot_elastic_s3(1,i), ybot_elastic_s3(1,i));
+%     fprintf(vertex_fid, '%1.16e \t %1.16e\n', xbot_elastic_s3(1,i), ybot_elastic_s3(1,i));
 end
 
-fclose(vertex_fid);
+% fclose(vertex_fid);
 
 if plotit ==1
     plot(xtop_elastic_s2,ytop_elastic_s3,'b.')

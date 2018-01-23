@@ -21,7 +21,7 @@ DX = (1.0*L)/NFINEST                      // Cartesian mesh width (m)
 // solver parameters
 DELTA_FUNCTION      = "IB_4"              //
 START_TIME          = 0.0e0               // initial simulation time
-END_TIME            = 1               // final simulation time
+END_TIME            = 0.3               // final simulation time
 GROW_DT             = 2.0e0               // growth factor for timesteps
 NUM_CYCLES          = 1                   // number of cycles of fixed-point iteration
 CONVECTIVE_OP_TYPE  = "PPM"               // convective differencing discretization type
@@ -93,16 +93,16 @@ IBMethod {                //
                 //
 IBStandardInitializer {                //
    max_levels = MAX_LEVELS                //
-   structure_names = "heart_tube_1" //, "heart_race_1", "markers_1"                //   
+   structure_names = "heart_tube_1", "heart_race_1", "markers_1"                //   
    heart_tube_1 {                //
       level_number = MAX_LEVELS - 1                //
    } //
-//   heart_race_1 {                //
-//      level_number = MAX_LEVELS - 1                //
-//   } //
-//   markers_1 {                //
-//      level_number = MAX_LEVELS - 1                //
-//   } //
+   heart_race_1 {                //
+      level_number = MAX_LEVELS - 1                //
+   } //
+   markers_1 {                //
+      level_number = MAX_LEVELS - 1                //
+   } //
 } //
 //
 INSStaggeredHierarchyIntegrator {                //

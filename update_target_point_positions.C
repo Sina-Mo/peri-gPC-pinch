@@ -14,8 +14,8 @@ void update_target_point_positions(
   const int finest_ln = hierarchy->getFinestLevelNumber();
 
   static const int numPts = 860;  // number of points in geometry
-  static double s_ramp = 0.05;    // time it takes to pinch or unpinch tube
-  static double pinch_time = 0.50;  // time it takes for the pinch to travel
+  static double s_ramp = 0.02;    // time it takes to pinch or unpinch tube
+  static double pinch_time = 0.20;  // time it takes for the pinch to travel
   static double centery = 0.0;  // Center of domain y
   static double diameter = pf.tdiameter;  // Diameter of the tube
   static double R2 = pf.tR2; // distance from middle of domain to inner wall
@@ -27,46 +27,6 @@ void update_target_point_positions(
 
   // static const double pi = 4*atan(1);  // The number Pi
 
-  //Storing the (x,y) positions in all three states
-  static double xP1[numPts];  //Stores x-values for state 1
-  static double yP1[numPts];  //Stores y-values for state 1
-  static double xP2[numPts];  //Stores x-values for state 2
-  static double yP2[numPts];  //Stores y-values for state 2
-  static double xP3[numPts];  //Stores x-values for state 3
-  static double yP3[numPts];  //Stores y-values for state 3
-
-  FILE *fP1x, *fP1y, *fP2x, *fP2y, *fP3x, *fP3y;
-
-  fP1x = fopen("xP1.txt", "r");
-  fP1y = fopen("yP1.txt", "r");
-  
-  fP2x = fopen("xP2.txt", "r");
-  fP2y = fopen("yP2.txt", "r");
-  
-  fP3x = fopen("xP3.txt", "r");
-  fP3y = fopen("yP3.txt", "r");
-
-  for(int i=0; i<numPts; i++){
-
-    fscanf(fP1x,"%lf\n",&xP1[i]);
-    fscanf(fP1y,"%lf\n",&yP1[i]);
-
-    fscanf(fP2x,"%lf\n",&xP2[i]);
-    fscanf(fP2y,"%lf\n",&yP2[i]);
-
-    fscanf(fP3x,"%lf\n",&xP3[i]);
-    fscanf(fP3y,"%lf\n",&yP3[i]);
-
-  }
-
-  fclose(fP1x);
-  fclose(fP1y);
-  fclose(fP2x);
-  fclose(fP2y);
-  fclose(fP3x);
-  fclose(fP3y);
-  
-  
   //
   // Find out the Lagrangian index ranges.
   //
@@ -116,36 +76,36 @@ void update_target_point_positions(
 	   // X_target[0] = xP1[lag_idx] + (xP2[lag_idx]-xP1[lag_idx])*(current_time/s_ramp);
 	   // X_target[1] = yP1[lag_idx] + (yP2[lag_idx]-yP1[lag_idx])*(current_time/s_ramp);  //This works.
 
-	   if (lag_idx <(numPts/2))
+	   if (lag_idx >=lag_idxs.first && lag_idx<(numPts/2))
              {
 	       //X_target[0] = xP2[lag_idx] + (xP3[lag_idx]-xP2[lag_idx])*(current_time/s_ramp);                                                              
 	       X_target[1] = centery-R2-(current_time/s_ramp)*(diameter*pamp/2.0)*exp(-0.5*pow((X_target[0]+mu)/sigma,2.0));
 	       //X_target[1]=X_target[1]+0.00001;
-	     } else {
+	     } else if (lag_idx >=(numPts/2) && lag_idx <numPts) {
 	     X_target[1] = centery-R1+(current_time/s_ramp)*(diameter*pamp/2.0)*exp(-0.5*pow((X_target[0]+mu)/sigma,2.0));
 	     //X_target[1] = X_target[1]-0.00001;
-	   }
+	   } else { }
 
 	 } else if(current_time>s_ramp && current_time<=(pinch_time+s_ramp))
 	 {
-	   double mu1 = mu-2*mu*((current_time-s_ramp)/(pinch_time+s_ramp));
+	   double mu1 = mu-2*mu*((current_time-s_ramp)/(pinch_time));
 	   
-	   if (lag_idx <(numPts/2))
+	   if (lag_idx >=lag_idxs.first && lag_idx<(numPts/2))
 	     { 
 	   //X_target[0] = xP2[lag_idx] + (xP3[lag_idx]-xP2[lag_idx])*(current_time/s_ramp);
 	       X_target[1] = centery-R2-(diameter*pamp/2)*exp(-0.5*pow((X_target[0]+mu1)/sigma,2.0));
-	     } else {
+	     } else if (lag_idx >=(numPts/2) && lag_idx < numPts) {
 	     X_target[1] = centery-R1+(diameter*pamp/2)*exp(-0.5*pow((X_target[0]+mu1)/sigma,2.0));
-	   }
+	   } else { }
 	 } else if (current_time>(pinch_time+s_ramp) && current_time<=(2*s_ramp+pinch_time)) 
 	   {
 	   
-	     if (lag_idx <(numPts/2))
+	     if (lag_idx >=lag_idxs.first && lag_idx<(numPts/2))
 	       {
-		 X_target[1] = centery-R2-(1-(current_time-(pinch_time+s_ramp))/s_ramp)*(diameter*pamp/2.0)*exp(-0.5*pow((X_target[0]+mu)/sigma,2.0)); 
-	       } else {
-	         X_target[1] = centery-R1+(1-(current_time-(pinch_time+s_ramp))/s_ramp)*(diameter*pamp/2.0)*exp(-0.5*pow((X_target[0]+mu)/sigma,2.0)); 
-	     }
+		 X_target[1] = centery-R2-(1-(current_time-(pinch_time+s_ramp))/(s_ramp))*(diameter*pamp/2.0)*exp(-0.5*pow((X_target[0]-mu)/sigma,2.0)); 
+	       } else if (lag_idx >=(numPts/2) && lag_idx <numPts) {
+	       X_target[1] = centery-R1+(1-(current_time-(pinch_time+s_ramp))/(s_ramp))*(diameter*pamp/2.0)*exp(-0.5*pow((X_target[0]-mu)/sigma,2.0)); 
+	     } else { }
 	   
 	   } else {
 	   }
