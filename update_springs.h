@@ -3,6 +3,7 @@
 
 #include <ibamr/app_namespaces.h>
 #include <ibtk/LDataManager.h>
+#include "parameterfile.h"
 
 /*
  * Update the positions of the target point specifications.
@@ -15,4 +16,4 @@ update_springs(
     const double dt,
     ParameterFile &);
 
-#endif //#ifndef included_update_target_point_positions
+#endif //#ifndef included_update_springs

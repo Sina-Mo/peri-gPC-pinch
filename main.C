@@ -30,6 +30,7 @@
 
 // Headers for application specific operations.
 #include "update_target_point_positions.h"
+#include "update_springs.h"
 
 // Function prototypes
 void

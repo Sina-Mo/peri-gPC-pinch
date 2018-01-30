@@ -1,3 +1,5 @@
+#ifndef PARAMETER_FILE_INCLUDE
+#define PARAMETER_FILE_INCLUDE
 
 // Struct that holds all input parameters from a file
 struct ParameterFile {
@@ -47,3 +49,4 @@ struct ParameterFile {
 	//ParameterFile();
 	//~ParameterFile();
 };
+#endif //ifndef PARAMETER_FILE_INCLUDE

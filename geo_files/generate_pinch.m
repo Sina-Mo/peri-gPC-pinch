@@ -290,9 +290,8 @@ target_fid = fopen([mesh_name 'race_' num2str(n) '.target'], 'w');
 fprintf(target_fid, '%d\n', Nrace);
 
 for i = 0:Nrace-1,
-    fprintf(target_fid, '%d %1.16e\n', i, 0.1*kappa_target*ds/(ds^2));
+    fprintf(target_fid, '%d %1.16e\n', i, kappa_target*ds/(ds^2));
 end
-
 
 
 fclose(target_fid);
