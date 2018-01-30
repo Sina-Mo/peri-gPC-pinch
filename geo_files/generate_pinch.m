@@ -66,9 +66,9 @@ dmy = diameter/(Nmarkersy-1);       %space between markers in y-direction
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % material parameters
-kappa_spring = 200;%2.0;               % spring constant (Newton)
-kappa_beam = 0;%2e-8;                 % beam stiffness constant (Newton m^2) %2.5e-2 works for Wo>=5
-kappa_target = 20000;        % target point penalty spring constant (Newton)
+kappa_spring = 20.0;               % spring constant (Newton)
+kappa_beam = 2e-6;                 % beam stiffness constant (Newton m^2) %2.5e-2 works for Wo>=5
+kappa_target = 10*kappa_spring;        % target point penalty spring constant (Newton)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -229,7 +229,7 @@ y_race = zeros(1,Nrace);
 vertex_fid = fopen([mesh_name 'race_' num2str(n) '.vertex'], 'w');
 fprintf(vertex_fid, '%d\n', Nrace);
 
-%right curved part of racetrack
+%right inner curved part of racetrack 
 for i=1:ceil(Ncurve/2),
     theta = (i-1)*dtheta-pi/2;
     y_race(1,i) = centery+R2*sin(theta);
@@ -237,36 +237,40 @@ for i=1:ceil(Ncurve/2),
     fprintf(vertex_fid, '%1.16e %1.16e\n', x_race(1,i), y_race(1,i));
 end
 
-for i=ceil(Ncurve/2)+1:Ncurve,
-    theta=(i-Ncurve/2-1)*dtheta-pi/2;
-    y_race(1,i) = centery+R1*sin(theta);
-    x_race(1,i) = Lt/2+R1*cos(theta);
-    fprintf(vertex_fid, '%1.16e %1.16e\n', x_race(1,i), y_race(1,i));
-end
-
-%straight section on the top
-for i = Ncurve+1:Ncurve+ceil(Nstraight/2),
+%straight inner section on the top
+for i = (Ncurve/2)+1:(Ncurve/2)+ceil(Nstraight/2),
     y_race(1,i) = centery+R2;
-    x_race(1,i) = centerx2-(i-Ncurve-1)*ds;
+    x_race(1,i) = centerx2-(i-(Ncurve/2)-1)*ds;
     fprintf(vertex_fid, '%1.16e %1.16e\n', x_race(1,i), y_race(1,i));
 end
 
-for i = Ncurve+ceil(Nstraight/2)+1:Ncurve+Nstraight,
-    y_race(1,i) = centery+R1;
-    x_race(1,i) = centerx2-(i-Ncurve-ceil(Nstraight/2)-1)*ds;
-    fprintf(vertex_fid, '%1.16e %1.16e\n', x_race(1,i), y_race(1,i));
-end
-
-%left curved part of racetrack
-for i = Ncurve+Nstraight+1:Ncurve+Nstraight+ceil(Ncurve/2),
-    theta = pi/2+(i-Ncurve-Nstraight-1)*dtheta;
+%left inner curved part of racetrack
+for i = (Ncurve/2)+ceil(Nstraight/2)+1:Ncurve+ceil(Nstraight/2),
+    theta = pi/2+(i-((Ncurve/2)+ceil(Nstraight/2))-1)*dtheta;
     y_race(1,i) = centery+R2*sin(theta);
     x_race(1,i) = centerx1+R2*cos(theta);
     fprintf(vertex_fid, '%1.16e %1.16e\n', x_race(1,i), y_race(1,i));
 end
 
-for i = Ncurve+Nstraight+ceil(Ncurve/2)+1:2*Ncurve+Nstraight,
-    theta = pi/2+(i-Ncurve-Nstraight-ceil(Ncurve/2)-1)*dtheta;
+%right outer curved part of racetrack 
+for i=Ncurve+ceil(Nstraight/2)+1:Ncurve+(Ncurve/2)+ceil(Nstraight/2),
+    theta=(i-(Ncurve+ceil(Nstraight/2))-1)*dtheta-pi/2;
+    y_race(1,i) = centery+R1*sin(theta);
+    x_race(1,i) = Lt/2+R1*cos(theta);
+    fprintf(vertex_fid, '%1.16e %1.16e\n', x_race(1,i), y_race(1,i));
+end
+
+%straight outer section on the top
+for i = Ncurve+(Ncurve/2)+ceil(Nstraight/2)+1:Ncurve+(Ncurve/2)+Nstraight,
+    y_race(1,i) = centery+R1;
+    x_race(1,i) = centerx2-(i-(Ncurve+(Ncurve/2)+ceil(Nstraight/2))-1)*ds;
+    fprintf(vertex_fid, '%1.16e %1.16e\n', x_race(1,i), y_race(1,i));
+end
+
+
+%left outer curved part of racetrack
+for i = Ncurve+(Ncurve/2)+Nstraight+1:2*Ncurve+Nstraight,
+    theta = pi/2+(i-(Ncurve+(Ncurve/2)+Nstraight)-1)*dtheta;
     y_race(1,i) = centery+R1*sin(theta);
     x_race(1,i) = centerx1+R1*cos(theta);
     fprintf(vertex_fid, '%1.16e %1.16e\n', x_race(1,i), y_race(1,i));
@@ -286,10 +290,30 @@ target_fid = fopen([mesh_name 'race_' num2str(n) '.target'], 'w');
 fprintf(target_fid, '%d\n', Nrace);
 
 for i = 0:Nrace-1,
-    fprintf(target_fid, '%d %1.16e\n', i, kappa_target*ds/(ds^2));
+    fprintf(target_fid, '%d %1.16e\n', i, 0.1*kappa_target*ds/(ds^2));
 end
 
+
+
 fclose(target_fid);
+
+% Write out the beam information for the elastic section
+
+beam_fid = fopen([mesh_name 'race_' num2str(n) '.beam'], 'w');
+fprintf(beam_fid, '%d\n', Nrace-4);
+
+
+%right curved part of racetrack
+for i=0:(Ncurve+ceil(Nstraight/2))-2,
+    fprintf(beam_fid, '%d %d %d %1.16e\n', i, i+1, i+2, kappa_beam*ds/(ds^4));
+end
+
+for i=Ncurve+ceil(Nstraight/2)+1:Nrace-3,
+    fprintf(beam_fid, '%d %d %d %1.16e\n', i, i+1, i+2, kappa_beam*ds/(ds^4));
+end
+
+fclose(beam_fid);
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

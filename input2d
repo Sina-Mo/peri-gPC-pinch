@@ -1,7 +1,7 @@
 // physical parameters
 //
 L = 1.0                                   // length of the computational (fluid) domain (m)
-D = 0.1									//diameter of tube (m)
+D = 0.04									//diameter of tube (m)
 FRE = 1.25									//pumping frequency (Hz)
 RHO = 1000.0   						//fluid mass density (kg/m^3)
 WO = 5.05								// desired Womersley number,original calculation
