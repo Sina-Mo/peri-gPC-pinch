@@ -68,7 +68,7 @@ dmy = (diameter-0.002)/(Nmarkersy-1);       %space between markers in y-directio
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % material parameters
 kappa_spring = 30.0;               % spring constant (Newton)
-kappa_beam_race = 2e-1;                 % beam stiffness constant (Newton m^2) %2.5e-2 works for Wo>=5
+kappa_beam_race = 2e-3;                 % beam stiffness constant (Newton m^2) %2.5e-2 works for Wo>=5
 kappa_beam_tube = 5e-2;
 kappa_target = 20*kappa_spring;        % target point penalty spring constant (Newton)  
 
@@ -269,28 +269,30 @@ target_fid = fopen([mesh_name 'race_' num2str(n) '.target'], 'w');
 fprintf(target_fid, '%d\n', Nrace);
 
 for i = 0:Nrace-1,
-    fprintf(target_fid, '%d %1.16e %1.16e\n', i, kappa_target*ds/(ds^2), rho*(dx^dim));
+%      fprintf(target_fid, '%d %1.16e\n', i, kappa_target*ds/(ds^2));
+   fprintf(target_fid, '%d %1.16e %1.16e\n', i, kappa_target*ds/(ds^2), 2*rho*(dx^dim));
 end
 
 
 fclose(target_fid);
 
 % % Write out the beam information for the elastic section
-% 
-% beam_fid = fopen([mesh_name 'race_' num2str(n) '.beam'], 'w');
-% fprintf(beam_fid, '%d\n', Nrace-4);
-% 
-% 
-% %right curved part of racetrack
-% for i=0:(Ncurve+ceil(Nstraight/2))-3,
-%     fprintf(beam_fid, '%d %d %d %1.16e\n', i, i+1, i+2, kappa_beam_race*ds/(ds^4));
-% end
-% 
-% for i=Ncurve+ceil(Nstraight/2):Nrace-3,
-%     fprintf(beam_fid, '%d %d %d %1.16e\n', i, i+1, i+2, kappa_beam_race*ds/(ds^4));
-% end
-% 
-% fclose(beam_fid);
+
+beam_fid = fopen([mesh_name 'race_' num2str(n) '.beam'], 'w');
+fprintf(beam_fid, '%d\n', Nrace-4);
+
+
+%right curved part of racetrack
+for i=0:(Ncurve+ceil(Nstraight/2))-3,
+    fprintf(beam_fid, '%d %d %d %1.16e\n', i, i+1, i+2, kappa_beam_race*ds/(ds^4));
+end
+
+%left curved part of racetrack
+for i=Ncurve+ceil(Nstraight/2):Nrace-3,
+    fprintf(beam_fid, '%d %d %d %1.16e\n', i, i+1, i+2, kappa_beam_race*ds/(ds^4));
+end
+
+fclose(beam_fid);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -105,8 +105,8 @@ update_springs(
 	    //beam_stiff = bend2;
 	  } else if (lag_idx>=(lag_idxs.first+Nend) && lag_idx<=(lag_idxs.second-Nend)) {
 	    //resting_length = rest1;
-	    X_spring = 100*kappa1;
-	    spring_stiffness = 100*kappa1;
+	    X_spring = 25*kappa1;
+	    spring_stiffness = 50*kappa1;
 	    //beam_stiff = bend1;
 	  } else {}
 	} else {}
