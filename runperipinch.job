@@ -1,13 +1,19 @@
 #!/bin/bash
 #SBATCH -p RM-shared
-#SBATCH -t 12:00:00
+#SBATCH -t 30:00:00
 #SBATCH -N 1
-#SBATCH --ntasks-per-node=12
+#SBATCH --ntasks-per-node=8
 #SBATCH --mail-type=ALL
 
-startrun=2
-endrun=4
+startrun=31
+endrun=40
 
+# ARRAYNAME='runs'
+# runs=( 681 )
+
+# array="${ARRAYNAME}[@]"
+
+# for i in "${!array}";
 for i in `seq $startrun $endrun`;
 do
    # echo commands to stdout
