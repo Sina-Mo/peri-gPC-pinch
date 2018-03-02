@@ -17,39 +17,25 @@ update_springs(
     const int finest_ln = hierarchy->getFinestLevelNumber();
 
     //static const double pi = 4*atan(1);
-    static const double L1 = 1; // length of computational domain (meters)
+    //static const double L1 = 1; // length of computational domain (meters)
     static const int N1 = 512; // number of cartesian grid meshwidths at the finest level of the AMR grid
+    static const int numPts = 860;
     static const int Nend = 10;
     static const double Let = pf.Let;
     static const double diameter = pf.tdiameter;
     static const double R2 = pf.tR2;
     static const double R1 = R2+diameter;
     static const double freq = pf.freq; // frequency of heart beats
-    static const double period = 1/freq;  // Period of single heart beat
     static const double s_ramp = 0.02;    // time it takes to pinch or unpinch tube
-    static const double speed = 2.0;  // Speed of contraction wave
-    static const double pinch_time = Let/speed;  // time it takes for the pinch to travel
-
-    static const double kappa1 = 3000.0;
-    static const double kappa2 = 100*kappa1;
+    static const double speed = 0.3;  // Speed of contraction wave
+    static const double kappa1 = 3000.0;  // Value that works for single-pinch: 3000.0
+    static const double kappa2 = 100*kappa1; //Value that works for single-pinch: 100*kappa1
     static const double rest2 = 0.0014;
     static const double rest1 = rest2/10;
     //static const double bend1 = 5.0e8;
     //static const double bend2 = 5.0e6;
-    static const int numPts = 860;
     static const double cutoffhigh = -R2-0.005*diameter;
     static const double cutofflow = -R1+0.005*diameter;
-
-    // Normalize the current time of the simulation to the period of the heart beat
-    double num = current_time/period; // Normalizes current time to the period of heart beat
-    int intpart = (int)num;   // Extracts the integer part 
-    double loop_time = num-intpart; // Subtracts the integer part (we are only interested in the decimal part, the unfinished portion of the beat, not the number of beats that have been completed)
-
-
-    // Normalize the different periods to the period of a heart beat.
-    double rampup = s_ramp/period; 
-    double pinchend = (pinch_time+s_ramp)/period;
-    double rampdown = (pinch_time+2*s_ramp)/period;
 
     // Find out the Lagrangian index ranges.
     const std::pair<int,int>& lag_idxs = l_data_manager->getLagrangianStructureIndexRange(0, finest_ln);
@@ -92,22 +78,26 @@ update_springs(
 	//Note that you can also getStiffnesses
 	double spring_stiffness = spring_spec->getParameters()[0][0];
 	//resting_length+=0.01*dt;
-	if (loop_time>=0.05*rampup && loop_time<=period){
+	if (current_time>=0.05*s_ramp){
+	  
 	  if (lag_idx>=(lag_idxs.first+Nend) && lag_idx<(numPts/2-Nend) && X_target[1]<cutoffhigh) {
+	    
 	    //resting_length = rest2;
 	    X_spring = kappa2*10;
 	    spring_stiffness = kappa2*10;
-	    //  beam_stiff = bend2;
+	    
 	  } else if (lag_idx<=(lag_idxs.second-Nend) && lag_idx>=(numPts/2+Nend) && X_target[1]>cutofflow){
+	    
 	    //resting_length = rest2;
 	    X_spring = kappa2*10;
 	    spring_stiffness = kappa2*10;
-	    //beam_stiff = bend2;
+	    
 	  } else if (lag_idx>=(lag_idxs.first+Nend) && lag_idx<=(lag_idxs.second-Nend)) {
+	    
 	    //resting_length = rest1;
 	    X_spring = 25*kappa1;
 	    spring_stiffness = 50*kappa1;
-	    //beam_stiff = bend1;
+	    
 	  } else {}
 	} else {}
       }

@@ -16,35 +16,76 @@ void update_target_point_positions(
 
   // Initialize a bunch of parameters
   static const double freq = pf.freq; // frequency of heart beats
-  static const double Let = pf.Let;  // Length of heart tube
-  static const int Nend = 10;
-  static const double speed = 2.0;  // Speed of contraction wave
-  static const int numPts = 860;  // number of points in geometry
+  static const double period = 1/freq;  // Period of single heart beat   
   static const double s_ramp = 0.02;    // time it takes to pinch or unpinch tube
-  static const double pinch_time = Let/speed;  // time it takes for the pinch to travel
+  
+  static const double Let = pf.Let;  // Length of heart tube
+  static const double speed = 0.3;  // Speed of contraction wave
+  static const int numPts = 860;  // number of points in geometry
+  static const int Nend = 54;
+  static const double acc_ramp = 0.01;  // time to accelerate the pinch movement
   static const double centery = 0.0;  // Center of domain y
   static const double diameter = pf.tdiameter;  // Diameter of the tube
   static const double R2 = pf.tR2; // distance from middle of domain to inner wall
   static const double R1 = R2+diameter; // distance from middle of domain to outer wall
   static const double pamp = pf.pamp;  // percent occlusion of tube
   static const double sigma = 0.0085;  // pointiness of pinch
-  static const double mu = 0.15;   // how far from x-center pinch starts
-  double mu1 = 0.15; 
-  // static const double kappa1 = 60.0;
-  //static const double kappa2 = 2600.0;
-  static const double period = 1/freq;  // Period of single heart beat
-  // static const double pi = 4*atan(1);  // The number Pi  
+  static const double mu = -0.5*Let;   // how far from x-center pinch starts
+  static const double offset = speed/freq; //Offset bewteen peaks
+  double dx = speed*dt;	//Distance to move each time step
+  static const double stop_pt = mu+3*offset; //Stopping distance
+  double crampup = 0.0;
+  double mu1 = mu; 
+  double mu2 = mu+offset;
+  double mu3 = mu+2*offset;
+  double num;
+  int intpart;
+  double addto;
+  
+  if(current_time <= s_ramp)  // If the normalized time is less than the time it takes to start the pinch
+	 {  // Start the pinch
+		 crampup = current_time/s_ramp;
+	 
+	// } else if (current_time > s_ramp && current_time <= (s_ramp+acc_ramp)) {
+	 
+	//	 camp = 1.0;
+		
+	//	 mu1 += (current_time/(s_ramp+acc_ramp))*dx;
+	//	 mu2 += (current_time/(s_ramp+acc_ramp))*dx;
+	//	 mu3 += (current_time/(s_ramp+acc_ramp))*dx;
 
-  // Normalize the current time of the simulation to the period of the heart beat
-  double num = current_time/period; // Normalizes current time to the period of heart beat
-  int intpart = (int)num;   // Extracts the integer part 
-  double loop_time = num-intpart; // Subtracts the integer part (we are only interested in the decimal part, the unfinished portion of the beat, not the number of beats that have been completed)
-
-  // Normalize the different periods to the period of a heart beat.
-  double rampup = s_ramp/period; 
-  double pinchend = (pinch_time+s_ramp)/period;
-  double rampdown = (pinch_time+2*s_ramp)/period;
-
+       //if (mu1 >= stop_pt) { mu1 = mu; } else { }
+	   //if (mu2 >= stop_pt) { mu2 = mu; } else { }
+	   //if (mu3 >= stop_pt) { mu3 = mu; } else { }
+		 
+	 } else {
+	 
+	   crampup = 1.0;
+	   mu1 += (current_time-s_ramp)*speed;
+	   mu2 += (current_time-s_ramp)*speed;
+	   mu3 += (current_time-s_ramp)*speed;
+	   
+	   // Make the pinch travel down the tube 	   
+	   if (mu1 >= stop_pt) { 
+	   	num = mu1/stop_pt;
+	   	intpart = (int)num;
+	   	addto = num-intpart;
+	   	mu1 = mu + (addto*stop_pt); } 
+	   	else { }
+	   if (mu2 >= stop_pt) { 
+	   	num = mu2/stop_pt;
+	   	intpart = (int)num;
+	   	addto = num-intpart;
+	   	mu2 = mu + (addto*stop_pt); } 
+	   	else { }
+	   if (mu3 >= stop_pt) { 
+	   	num = mu3/stop_pt;
+	   	intpart = (int)num;
+	   	addto = num-intpart;
+	   	mu3 = mu + (addto*stop_pt); } 
+	   	else { }
+	} // Ends time loop
+	
   // Find out the Lagrangian index ranges.
   //
     const std::pair<int,int>& lag_idxs = l_data_manager->getLagrangianStructureIndexRange(0, finest_ln);
@@ -82,7 +123,7 @@ void update_target_point_positions(
       // Depending on the version of IBAMR, you'll need to select one fo the ways of accessing target point positions
       // FOR KD MODULE:
        Point& X_target = force_spec->getTargetPointPosition();
-       double X_stiff = force_spec->getStiffness();
+       //double X_stiff = force_spec->getStiffness();
       //FOR NEMOS / KD (NOT MODULE):
       //TinyVector<double,NDIM>& X_target = force_spec->getTargetPointPosition();
 
@@ -90,86 +131,22 @@ void update_target_point_positions(
       //IBTK::Vector<double,NDIM>& X_target = force_spec->getTargetPointPosition();
 
       // Tell the target points how to move: 
-       if(loop_time<=rampup)  // If the normalized time is less than the time it takes to start the pinch
-	 {  // Start the pinch
 
-	   if (lag_idx >=(lag_idxs.first+Nend) && lag_idx<(numPts/2-Nend)) // If it is on the top (inner) part of the heart tube
-             {
+	if (lag_idx >=(lag_idxs.first+Nend) && lag_idx<(numPts/2-Nend)) // If it is on the top (inner) part of the heart tube
+    	{
                // Move points into a pinch, ramp this up based on the loop time                      
-	       X_target[1] = centery-R2-(loop_time/rampup)*(diameter*pamp/2.0)*exp(-0.5*pow((X_target[0]+mu)/sigma,2.0));
+	  	 	X_target[1] = centery-R2 - crampup*(diameter*pamp/2.0)*exp(-0.5*pow((X_target[0]-mu1)/sigma,2.0)) - crampup*(diameter*pamp/2.0)*exp(-0.5*pow((X_target[0]-mu2)/sigma,2.0)) - crampup*(diameter*pamp/2.0)*exp(-0.5*pow((X_target[0]-mu3)/sigma,2.0));
 	       
-	       //if (X_target[1]<=(centery-R2-0.1*diameter)){
-	       //	 X_stiff = kappa2;
-	       //} else {
-	       // X_stiff = kappa1;
-	       //}
-	     } else if (lag_idx >=(numPts/2+Nend) && lag_idx <(lag_idxs.second-Nend))  // If it is on the bottom (outer) part of the heart tube 
-	     { 
+	    } else if (lag_idx >=(numPts/2+Nend) && lag_idx <(lag_idxs.second-Nend))  // If it is on the bottom (outer) part of the heart tube 
+	    { 
 
-	     X_target[1] = centery-R1+(loop_time/rampup)*(diameter*pamp/2.0)*exp(-0.5*pow((X_target[0]+mu)/sigma,2.0));
+	    	X_target[1] = centery-R1 + crampup*(diameter*pamp/2.0)*exp(-0.5*pow((X_target[0]-mu1)/sigma,2.0)) + crampup*(diameter*pamp/2.0)*exp(-0.5*pow((X_target[0]-mu2)/sigma,2.0)) + crampup*(diameter*pamp/2.0)*exp(-0.5*pow((X_target[0]-mu3)/sigma,2.0));
 	     
-	     //if (X_target[1]<=(centery-R1+0.1*diameter)){
-	     //  X_stiff = kappa2;
-	     //} else {
-	     //  X_stiff = kappa1;
-	     //}
-	     } else { } // Otherwise do nothing 
+	    } else { } // Otherwise do nothing 
 
-	 } else if(loop_time>rampup && loop_time<=pinchend) // If the normalized time is greater than starting the pinch, less than the end of the pinch traveling along the tube,
-	 { 
-	   // Make the pinch travel down the tube 
-	   double mu1 = mu-2*mu*((loop_time-rampup)/(pinchend-rampup));  // Define the offset of the pinch center based on the normalized time
-	   
-	   if (lag_idx >=(lag_idxs.first+Nend) && lag_idx<(numPts/2-Nend)) // If it is on the top part of the tube
-	     { 
-
-	       X_target[1] = centery-R2-(diameter*pamp/2)*exp(-0.5*pow((X_target[0]+mu1)/sigma,2.0)); 
-
-	       //if (X_target[1]<=(centery-R2-0.1*diameter)){
-               //  X_stiff = kappa2;
-	       //} else {
-               //  X_stiff = kappa1;
-	       // }
-
-	     } else if (lag_idx >=(numPts/2+Nend) && lag_idx <(lag_idxs.second-Nend)) {  // If it is on the bottom part of the tube
-
-	     X_target[1] = centery-R1+(diameter*pamp/2)*exp(-0.5*pow((X_target[0]+mu1)/sigma,2.0));
-	     //if (X_target[1]<=(centery-R1+0.1*diameter)){
-             //  X_stiff = kappa2;
-             //} else {
-             //  X_stiff = kappa1;
-             //}
-	   } else { }  // Otherwise do nothing
-
-	 } else if (loop_time>pinchend && loop_time<=rampdown) //If the normalized time is greater than the end of travel but less than the end of the unpinch 
-	   { 
-	     // Unpinch the tube
-	     if (lag_idx >=(lag_idxs.first+Nend) && lag_idx<(numPts/2-Nend))  // If it is on the top part of the tube
-	       {
-		
-		 X_target[1] = centery-R2-(1-(loop_time-pinchend)/rampup)*(diameter*pamp/2.0)*exp(-0.5*pow((X_target[0]-mu)/sigma,2.0)); 
-		 // if (X_target[1]<=(centery-R2-0.1*diameter)){
-		 // X_stiff = kappa2;
-		 //} else {
-		 // X_stiff = kappa1;
-		 //}
-	       } else if (lag_idx >=(numPts/2+Nend) && lag_idx <(lag_idxs.second-Nend)) // If it is on the bottom part of the tube 
-	       { 
-	       
-	         X_target[1] = centery-R1+(1-(loop_time-pinchend)/rampup)*(diameter*pamp/2.0)*exp(-0.5*pow((X_target[0]-mu)/sigma,2.0)); 
-		 //if (X_target[1]<=(centery-R1+0.1*diameter)){
-		 //X_stiff = kappa2;
-		 //} else {
-		 // X_stiff = kappa1;
-		 //}
-	       } else { }  // Otherwise do nothing
-	   
-	   } else {  // Remaining time steps are a break with no target points being updated
-      
-       } //Ends time loop
        
-  } // Ends loop over target points
+	  } // Ends loop over target points
 
-  return;
+	return;
 
 } //update_target_point_positions

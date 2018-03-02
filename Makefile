@@ -2,13 +2,14 @@
 ######################################################################
 ## Here specify the location of the IBAMR source and the location
 ## where IBAMR has been built.
-IBAMR_SRC_DIR = /home/lwaldrop/sfw/bridges/ibamr_intel/IBAMR
-IBAMR_BUILD_DIR = /home/lwaldrop/sfw/bridges/ibamr_intel/bridges-intel-opt
-
-#IBAMR_SRC_DIR = /Users/Bosque/sfw/ibamr/IBAMR	           # Uncomment for use on Bosque
-#IBAMR_BUILD_DIR = /Users/Bosque/sfw/ibamr/killdevil-opt   # Uncomment for use on Bosque
-#IBAMR_SRC_DIR = /Users/Bosque/sfw/ibamr/IBAMR
-#IBAMR_BUILD_DIR = /Users/Bosque/sfw/ibamr/killdevil-opt
+# IBAMR_SRC_DIR = /home/lwaldrop/sfw/bridges/ibamr_intel/IBAMR
+# IBAMR_BUILD_DIR = /home/lwaldrop/sfw/bridges/ibamr_intel/bridges-intel-opt
+# IBAMR_SRC_DIR = /Users/Spectre/sfw/ibamr/IBAMR
+# IBAMR_BUILD_DIR = /Users/Spectre/sfw/ibamr/killdevil-dbg
+IBAMR_SRC_DIR = /Users/Bosque/sfw/ibamr/IBAMR
+IBAMR_BUILD_DIR = /Users/Bosque/sfw/ibamr/killdevil-opt
+# IBAMR_SRC_DIR = /Users/Bosque/sfw/ibamr/IBAMR
+# IBAMR_BUILD_DIR = /Users/Bosque/sfw/ibamr/killdevil-opt
 ######################################################################
 ## Include variables specific to the particular IBAMR build.
 include $(IBAMR_BUILD_DIR)/config/make.inc
