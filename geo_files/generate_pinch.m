@@ -160,11 +160,11 @@ fprintf(target_fid, '%d\n', Nstraight);
 
 %for i = 0:ceil(Nstraight/2)-1
 for i = 0:ceil(Nstraight/2)-1
-    fprintf(target_fid, '%d %1.16e %1.16e\n', i, kappa_target*ds/(ds^2), 2*sqrt(kappa_spring*rho*ds^2));
+   fprintf(target_fid, '%d %1.16e %1.16e\n', i, (1/20)*kappa_target*ds/(ds^2), 2*sqrt(kappa_spring*rho*ds^2));
 end
 
 for  i = ceil(Nstraight/2):Nstraight-1
-    fprintf(target_fid, '%d %1.16e %1.16e\n', i, kappa_target*ds/(ds^2), 2*sqrt(kappa_spring*rho*ds^2));
+   fprintf(target_fid, '%d %1.16e %1.16e\n', i, (1/20)*kappa_target*ds/(ds^2), 2*sqrt(kappa_spring*rho*ds^2));
 end
 fclose(target_fid);
 
