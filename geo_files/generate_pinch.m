@@ -69,7 +69,7 @@ dmy = (diameter-0.002)/(Nmarkersy-1);       %space between markers in y-directio
 % material parameters
 kappa_spring = 30.0;               % spring constant (Newton)
 kappa_beam_race = 2e-3;                 % beam stiffness constant (Newton m^2) %2.5e-2 works for Wo>=5
-kappa_beam_tube = 5e-2;
+kappa_beam_tube = 8e-2;
 kappa_target = 20*kappa_spring;        % target point penalty spring constant (Newton)  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -96,19 +96,19 @@ xbot_elastic = zeros(1,ceil(Nstraight/2));
 
 % Vertex information
 vertex_fid = fopen([mesh_name 'tube_' num2str(n) '.vertex'], 'w');
-fprintf(vertex_fid, '%d\n', Nstraight);
+fprintf(vertex_fid, '%d\n', 2*Nstraight);
 
 % Top section, elastic tube
-for i = 1:ceil(Nstraight/2)
+for i = 1:Nstraight
     ytop_elastic(1,i) = centery-R2;
-    xtop_elastic(1,i) = -Lt/2+(i-1)*ds;
+    xtop_elastic(1,i) = -Lt/2+(i-1)*0.5*ds;
     fprintf(vertex_fid, '%1.16e %1.16e\n', xtop_elastic(1,i), ytop_elastic(1,i));
 end
 
 % Bottom section, elastic tube
-for  i = 1:ceil(Nstraight/2)
+for  i = 1:Nstraight
     ybot_elastic(1,i) = centery-R1;
-    xbot_elastic(1,i) = -Lt/2+(i-1)*ds;
+    xbot_elastic(1,i) = -Lt/2+(i-1)*0.5*ds;
     fprintf(vertex_fid, '%1.16e %1.16e\n', xbot_elastic(1,i), ybot_elastic(1,i));
 end
 
@@ -124,15 +124,15 @@ end
 % Write out the spring information for the elastic section
 
 spring_fid = fopen([mesh_name 'tube_' num2str(n) '.spring'], 'w');
-fprintf(spring_fid, '%d\n', Nstraight-2);
+fprintf(spring_fid, '%d\n', 2*Nstraight-2);
 
 %elastic part of tube
-for i = 0:ceil(Nstraight/2)-2,
-    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', i, i+1, kappa_spring*ds/(ds^2), ds);
+for i = 0:Nstraight-2,
+    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', i, i+1, kappa_spring*0.5*ds/((0.5*ds)^2), 0.75*ds);
 end
 
-for i = ceil(Nstraight/2):Nstraight-2,
-    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', i, i+1, kappa_spring*ds/(ds^2), ds);
+for i = Nstraight:2*Nstraight-2,
+    fprintf(spring_fid, '%d %d %1.16e %1.16e\n', i, i+1, kappa_spring*0.5*ds/((0.5*ds)^2), 0.75*ds);
 end
 
 fclose(spring_fid);
@@ -140,15 +140,23 @@ fclose(spring_fid);
 % Write out the beam information for the elastic section
 
 beam_fid = fopen([mesh_name 'tube_' num2str(n) '.beam'], 'w');
-fprintf(beam_fid, '%d\n', Nstraight-4);
+fprintf(beam_fid, '%d\n', 2*Nstraight-4);
 
 %elastic part of tube
-for i = 0:ceil(Nstraight/2)-3,
-    fprintf(beam_fid, '%d %d %d %1.16e\n', i, i+1, i+2, kappa_beam_tube*ds/(ds^4));
+for i = 0:Nstraight-3,
+   % if i>=0 && i<=10 || i<=Nstraight-3 && i>=Nstraight-13
+        fprintf(beam_fid, '%d %d %d %1.16e\n', i, i+1, i+2, (1/10)*kappa_beam_tube*0.5*ds/((0.5*ds)^4));
+    %else
+     %   fprintf(beam_fid, '%d %d %d %1.16e\n', i, i+1, i+2, kappa_beam_tube*0.5*ds/((0.5*ds)^4));
+    %end
 end
 
-for i = ceil(Nstraight/2):Nstraight-3,
-    fprintf(beam_fid, '%d %d %d %1.16e\n', i, i+1, i+2, kappa_beam_tube*ds/(ds^4));
+for i = Nstraight:2*Nstraight-3,
+    %if i>=Nstraight && i<=Nstraight+10 %|| i<=2*Nstraight-3 && i>=2*Nstraight-13
+        fprintf(beam_fid, '%d %d %d %1.16e\n', i, i+1, i+2, (1/10)*kappa_beam_tube*0.5*ds/((0.5*ds)^4));
+    %else
+    %    fprintf(beam_fid, '%d %d %d %1.16e\n', i, i+1, i+2, kappa_beam_tube*0.5*ds/((0.5*ds)^4));
+    %end
 end
 fclose(beam_fid);
 
@@ -156,15 +164,15 @@ fclose(beam_fid);
 % % Write out the target point information for the elastic tube
 target_fid = fopen([mesh_name 'tube_' num2str(n) '.target'], 'w');
  
-fprintf(target_fid, '%d\n', Nstraight);
+fprintf(target_fid, '%d\n', 2*Nstraight);
 
 %for i = 0:ceil(Nstraight/2)-1
-for i = 0:ceil(Nstraight/2)-1
-   fprintf(target_fid, '%d %1.16e %1.16e\n', i, (1/20)*kappa_target*ds/(ds^2), 2*sqrt(kappa_spring*rho*ds^2));
+for i = 0:Nstraight-1
+   fprintf(target_fid, '%d %1.16e %1.16e\n', i, (1/20)*kappa_target*0.5*ds/((0.5*ds)^2), 2*sqrt(kappa_spring*rho*(0.5*ds)^2));
 end
 
-for  i = ceil(Nstraight/2):Nstraight-1
-   fprintf(target_fid, '%d %1.16e %1.16e\n', i, (1/20)*kappa_target*ds/(ds^2), 2*sqrt(kappa_spring*rho*ds^2));
+for  i = Nstraight:2*Nstraight-1
+   fprintf(target_fid, '%d %1.16e %1.16e\n', i, (1/20)*kappa_target*0.5*ds/((0.5*ds)^2), 2*sqrt(kappa_spring*rho*(0.5*ds)^2));
 end
 fclose(target_fid);
 
@@ -277,24 +285,24 @@ end
 fclose(target_fid);
 
 % % Write out the beam information for the elastic section
-
-beam_fid = fopen([mesh_name 'race_' num2str(n) '.beam'], 'w');
-fprintf(beam_fid, '%d\n', Nrace-4);
+%
+%beam_fid = fopen([mesh_name 'race_' num2str(n) '.beam'], 'w');
+%fprintf(beam_fid, '%d\n', Nrace-4);
 
 
 %right curved part of racetrack
-for i=0:(Ncurve+ceil(Nstraight/2))-3,
-    fprintf(beam_fid, '%d %d %d %1.16e\n', i, i+1, i+2, kappa_beam_race*ds/(ds^4));
-end
+%for i=0:(Ncurve+ceil(Nstraight/2))-3,
+%    fprintf(beam_fid, '%d %d %d %1.16e\n', i, i+1, i+2, kappa_beam_race*ds/(ds^4));
+%end
 
 %left curved part of racetrack
-for i=Ncurve+ceil(Nstraight/2):Nrace-3,
-    fprintf(beam_fid, '%d %d %d %1.16e\n', i, i+1, i+2, kappa_beam_race*ds/(ds^4));
-end
-
-fclose(beam_fid);
-
-
+%for i=Ncurve+ceil(Nstraight/2):Nrace-3,
+%    fprintf(beam_fid, '%d %d %d %1.16e\n', i, i+1, i+2, kappa_beam_race*ds/(ds^4));
+%end
+%
+%fclose(beam_fid);
+%
+%NOTE: No beams on the racetrack seem to do best. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Write out state change files

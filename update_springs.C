@@ -75,8 +75,8 @@ update_springs(
 			} else if (lag_idx>=(lag_idxs.first+Nend) && lag_idx<=(lag_idxs.second-Nend)) { // If not top or bottom but still in the tube    
 				// If the point is on the tube but not in the stiff cutoff range, make the springs very flexible:
 			    //resting_length = rest1;		// Change resting length of springs
-				X_spring = 25*kappa1;			// Change spring constant of target point tethering springs
-		    	spring_stiffness = 50*kappa1;	// Change spring constant of springs between vertex points
+				X_spring = 10*kappa1;			// Change spring constant of target point tethering springs
+		    	spring_stiffness = 100*kappa1;	// Change spring constant of springs between vertex points
 	    
 			} else {} 	 // If not in tube, do nothing.
 		} else {}		 // If before percent of ramp up time, do nothing.
