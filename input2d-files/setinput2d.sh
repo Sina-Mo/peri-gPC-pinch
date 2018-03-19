@@ -45,12 +45,3 @@ echo $i
 grep "END_TIME =" input2d${i}  && grep "FRE ="  input2d${i}
 
 done
-# above works
-
-# Some other tries down here. 
-# cat input2d |  awk -v var="$variable" 'NR==7 {$0="WO = var   // Womersley number"} 1' input2d > input2d2  # This will replace a single line in input2d and copy it to input2d
-
-# cat input2d |  awk 'BEGIN {} { for(i=1; i <=5; i++)  NR==7 $0="WO = $i   // Womersley number" 1}' input2d > input2d2
-
-# awk 'BEGIN { print "START" } { for(i=1; i <=NR; i++) print i} END { print NR }' input2d
-

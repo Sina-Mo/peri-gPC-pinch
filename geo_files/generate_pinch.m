@@ -305,8 +305,8 @@ fclose(target_fid);
 %NOTE: No beams on the racetrack seem to do best. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Write out state change files
-
+% Write out state change files.
+% Note: current code does not require state change files, it does this on its own. But I left them here in order to preview the pinch. 
 % Allocate space
 ytop_elastic_s1 = zeros(1,ceil(Nstraight/2));
 xtop_elastic_s1 = zeros(1,ceil(Nstraight/2));
