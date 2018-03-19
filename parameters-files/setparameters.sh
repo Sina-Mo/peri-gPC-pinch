@@ -9,7 +9,7 @@ cut -f 3 allpara.txt > Freq.txt
 numlines=$(grep -c "^" allpara.txt)
 
 # initialize variables
-pam=0
+pamp=0
 Freq=0
 # For loop that will write files
 for i in `seq 1 $numlines`;
@@ -22,10 +22,12 @@ cat template-parameters |  awk -v var="$pamp" 'NR==6 {$0="pamp = "'"var"'"  \\ "
 Freq=$(awk -v var="$i" 'NR==var' Freq.txt)
 # Writes file to replace line with Freq
 cat template-parameters |  awk -v var="$Freq" 'NR==7 {$0="freq = "'"var"'"   \\"} 1' parametersw${i} > parametersw${i}f${i}
-cat template-parameters |  awk -v var="$Freq" 'NR==8 {$0="iposn = "'"var"'"   \\"} 1' parametersw${i}f${i} > parametersw${i}f${i}l${i}
+# cat template-parameters |  awk -v var="$Freq" 'NR==8 {$0="iposn = "'"var"'"   \\"} 1' parametersw${i}f${i} > parametersw${i}f${i}l${i}
 # Cleans up folder
-rm parametersw${i} parametersw${i}f${i}
-mv parametersw${i}f${i}l${i} parameters${i}
+# mv parametersw${i}f${i}l${i} parameters${i}
+mv parametersw${i}f${i} parameters${i}
+rm parametersw${i} 
+
 done
 # above works
 
