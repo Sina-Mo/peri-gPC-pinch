@@ -56,22 +56,22 @@ void update_target_point_positions(
    	// It then calculates the position as a fraction of where between mu and the stop point the pinch is, 
    	// independent of how many times it has cycled through the heart tube. 
 	   if (mu1 >= stop_pt) { 	// Pinch #1
-	   		num = mu1/stop_pt;
+	     num = (mu1-mu)/(stop_pt-mu);
 	   		intpart = (int)num;
 	  	 	addto = num-intpart;
-	   		mu1 = mu + (addto*stop_pt); } 
+	   		mu1 = mu + (addto*3*offset); } 
 	   else { }
 	   if (mu2 >= stop_pt) { 	// Pinch #2
-	   		num = mu2/stop_pt;
+	     num = (mu2-mu)/(stop_pt-mu);
 	   		intpart = (int)num;
 	   		addto = num-intpart;
-	   		mu2 = mu + (addto*stop_pt); } 
+	   		mu2 = mu + (addto*3*offset); } 
 	   else { }
 	   if (mu3 >= stop_pt) { 	// Pinch #3
-	   		num = mu3/stop_pt;
+	     num = (mu3-mu)/(stop_pt-mu);
 	   		intpart = (int)num;
 		   	addto = num-intpart;
-		   	mu3 = mu + (addto*stop_pt); } 
+		   	mu3 = mu + (addto*3*offset); } 
 	   else { }
 	} // Ends loop over time
 	
