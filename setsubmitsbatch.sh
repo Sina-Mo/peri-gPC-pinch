@@ -2,8 +2,8 @@
 
 # What should you space the jobs by?
 countby=8
-startrun=544
-endrun=680
+startrun=1
+endrun=104
 howmany=$(((endrun-startrun+1)/countby))
 
 for i in `seq 1 $howmany`;
