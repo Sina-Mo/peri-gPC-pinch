@@ -359,42 +359,5 @@ output_data(Pointer<PatchHierarchy<NDIM> > patch_hierarchy,
     VecView(X_lag_vec, viewer);
     PetscViewerDestroy(&viewer);
     VecDestroy(&X_lag_vec);
-
-    Pointer<LData> F_data = l_data_manager->getLData("F", finest_hier_level);
-    Vec F_petsc_vec = F_data->getVec();
-    Vec F_lag_vec;
-    VecDuplicate(F_petsc_vec, &F_lag_vec);
-    l_data_manager->scatterPETScToLagrangian(F_petsc_vec, F_lag_vec, finest_hier_level);
-    file_name = data_dump_dirname + "/" + "F.";
-    sprintf(temp_buf, "%05d", iteration_num);
-    file_name += temp_buf;
-    PetscViewerASCIIOpen(PETSC_COMM_WORLD, file_name.c_str(), &viewer);
-    VecView(F_lag_vec, viewer);
-    PetscViewerDestroy(&viewer);
-    VecDestroy(&F_lag_vec);
-
-    // Sum up the forces (this is equivalent to computing the discrete
-    // force density).
-    double F_sum[NDIM];
-    for (unsigned int d = 0; d < NDIM; ++d) F_sum[d] = 0.0;
-    int local_sz;
-    VecGetLocalSize(F_petsc_vec, &local_sz);
-    double* F_array;
-    VecGetArray(F_petsc_vec, &F_array);
-    for (int k = 0; k < local_sz/NDIM; ++k)
-    {
-        for (unsigned int d = 0; d < NDIM; ++d)
-        {
-            F_sum[d] += F_array[NDIM*k+d];
-        }
-    }
-    SAMRAI_MPI::sumReduction(&F_sum[0],NDIM);
-    VecRestoreArray(F_petsc_vec, &F_array);
-    pout << "integral{F} =";
-    for (unsigned int d = 0; d < NDIM; ++d)
-    {
-        pout << " " << F_sum[d];
-    }
-    pout << "\n";
     return;
 }// output_data
