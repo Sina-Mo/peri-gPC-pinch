@@ -2,8 +2,13 @@
 ######################################################################
 ## Here specify the location of the IBAMR source and the location
 ## where IBAMR has been built.
-IBAMR_SRC_DIR = /home/lwaldrop/sfw/bridges/ibamr_intel/IBAMR
-IBAMR_BUILD_DIR = /home/lwaldrop/sfw/bridges/ibamr_intel/bridges-intel-opt
+#
+LIBS = $(LIBS) -lnetcdf -lcurl
+#
+IBAMR_SRC_DIR = /nas/longleaf/apps-dogwood/ibamr/2018-03/sfw/ibamr/IBAMR
+IBAMR_BUILD_DIR  =/nas/longleaf/apps-dogwood/ibamr/2018-03/sfw/ibamr/ibamr-objs-opt
+#IBAMR_SRC_DIR = /home/lwaldrop/sfw/bridges/ibamr_intel/IBAMR  #Uncomment for use on bridges
+#IBAMR_BUILD_DIR = /home/lwaldrop/sfw/bridges/ibamr_intel/bridges-intel-opt #Uncomment for use on bridges
 
 #IBAMR_SRC_DIR = /Users/Bosque/sfw/ibamr/IBAMR	           # Uncomment for use on Bosque
 #IBAMR_BUILD_DIR = /Users/Bosque/sfw/ibamr/killdevil-opt   # Uncomment for use on Bosque
