@@ -150,8 +150,6 @@ main(
             "IBStandardInitializer", app_initializer->getComponentDatabase("IBStandardInitializer"));
         ib_method_ops->registerLInitStrategy(ib_initializer);
         Pointer<IBStandardForceGen> ib_force_fcn = new IBStandardForceGen();
-		//ib_force_fcn->registerSpringForceFunction(1,&vp_spring_force,&vp_spring_force_deriv);
-		//ib_force_fcn->registerSpringForceFunction(2,&peri_spring_force,&peri_spring_force_deriv);
         ib_method_ops->registerIBLagrangianForceFunction(ib_force_fcn);
 
         // Create Eulerian initial condition specification objects.
