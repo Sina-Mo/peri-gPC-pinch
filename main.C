@@ -24,6 +24,7 @@
 #include <ibamr/app_namespaces.h>
 #include <ibtk/AppInitializer.h>
 #include <ibtk/LData.h>
+#include <ibtk/LDataManager.h>
 #include <ibtk/muParserCartGridFunction.h>
 #include <ibtk/muParserRobinBcCoefs.h>
 
@@ -33,13 +34,12 @@
 #include "update_springs.h"
 
 // Function prototypes
-void
-output_data(Pointer<PatchHierarchy<NDIM> > patch_hierarchy,
-    Pointer<INSHierarchyIntegrator> navier_stokes_integrator,
-    LDataManager* l_data_manager,
-    const int iteration_num,
-    const double loop_time,
-    const string& data_dump_dirname);
+void output_data(Pointer<PatchHierarchy<NDIM> > patch_hierarchy,
+                 Pointer<INSHierarchyIntegrator> navier_stokes_integrator,
+                 LDataManager* l_data_manager,
+                 const int iteration_num,
+                 const double loop_time,
+                 const string& data_dump_dirname);
 
 /*******************************************************************************
  * For each run, the input filename and restart information (if needed) must   *
@@ -65,12 +65,12 @@ main(
 
 
     // Initialize PETSc, MPI, and SAMRAI.
-    PetscInitialize(&argc,&argv,NULL,NULL);
+    PetscInitialize(&argc, &argv, NULL, NULL);
     SAMRAI_MPI::setCommunicator(PETSC_COMM_WORLD);
     SAMRAI_MPI::setCallAbortInSerialInsteadOfExit();
     SAMRAIManager::startup();
 
-    {// cleanup dynamically allocated objects prior to shutdown
+    { // cleanup dynamically allocated objects prior to shutdown
 
         // Parse command line options, set some standard options from the input
         // file, initialize the restart database (if this is a restarted run),
@@ -129,7 +129,8 @@ main(
                                               ib_method_ops,
                                               navier_stokes_integrator);
         Pointer<CartesianGridGeometry<NDIM> > grid_geometry = new CartesianGridGeometry<NDIM>(
-            "CartesianGeometry", app_initializer->getComponentDatabase("CartesianGeometry"));        Pointer<PatchHierarchy<NDIM> > patch_hierarchy = new PatchHierarchy<NDIM>("PatchHierarchy", grid_geometry);
+            "CartesianGeometry", app_initializer->getComponentDatabase("CartesianGeometry"));
+        Pointer<PatchHierarchy<NDIM> > patch_hierarchy = new PatchHierarchy<NDIM>("PatchHierarchy", grid_geometry);
         Pointer<StandardTagAndInitialize<NDIM> > error_detector =
             new StandardTagAndInitialize<NDIM>("StandardTagAndInitialize",
                                                time_integrator,
@@ -185,12 +186,13 @@ main(
                 ostringstream bc_coefs_name_stream;
                 bc_coefs_name_stream << "u_bc_coefs_" << d;
                 const string bc_coefs_name = bc_coefs_name_stream.str();
+                
                 ostringstream bc_coefs_db_name_stream;
                 bc_coefs_db_name_stream << "VelocityBcCoefs_" << d;
                 const string bc_coefs_db_name = bc_coefs_db_name_stream.str();
+                
                 u_bc_coefs[d] = new muParserRobinBcCoefs(
                     bc_coefs_name, app_initializer->getComponentDatabase(bc_coefs_db_name), grid_geometry);
-
             }
             navier_stokes_integrator->registerPhysicalBoundaryConditions(u_bc_coefs);
         }
@@ -259,7 +261,7 @@ main(
             dt = time_integrator->getMaximumTimeStepSize();
             LDataManager* l_data_manager = ib_method_ops->getLDataManager();
             update_target_point_positions(patch_hierarchy, l_data_manager, loop_time, dt, pf);
-	    update_springs(patch_hierarchy, l_data_manager, loop_time, dt, pf);
+	  		update_springs(patch_hierarchy, l_data_manager, loop_time, dt, pf);
             time_integrator->advanceHierarchy(dt);
             loop_time += dt;
 
@@ -306,20 +308,20 @@ main(
         // necessary).
         for (unsigned int d = 0; d < NDIM; ++d) delete u_bc_coefs[d];
 
-    }// cleanup dynamically allocated objects prior to shutdown
+    } // cleanup dynamically allocated objects prior to shutdown
 
     SAMRAIManager::shutdown();
     PetscFinalize();
     return 0;
-}// main
+} // main
 
 void
 output_data(Pointer<PatchHierarchy<NDIM> > patch_hierarchy,
-    Pointer<INSHierarchyIntegrator> navier_stokes_integrator,
-    LDataManager* l_data_manager,
-    const int iteration_num,
-    const double loop_time,
-    const string& data_dump_dirname)
+            Pointer<INSHierarchyIntegrator> navier_stokes_integrator,
+            LDataManager* l_data_manager,
+            const int iteration_num,
+            const double loop_time,
+            const string& data_dump_dirname)
 {
     plog << "writing hierarchy data at iteration " << iteration_num << " to disk" << endl;
     plog << "simulation time is " << loop_time << endl;
@@ -352,7 +354,7 @@ output_data(Pointer<PatchHierarchy<NDIM> > patch_hierarchy,
     file_name = data_dump_dirname + "/" + "X.";
     sprintf(temp_buf, "%05d", iteration_num);
     file_name += temp_buf;
-	PetscViewer viewer;
+    PetscViewer viewer;
     PetscViewerASCIIOpen(PETSC_COMM_WORLD, file_name.c_str(), &viewer);
     VecView(X_lag_vec, viewer);
     PetscViewerDestroy(&viewer);
