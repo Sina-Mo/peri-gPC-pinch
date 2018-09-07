@@ -1,2 +1,2 @@
-# peri-gPC-git
-Peristalsis gPC code
+# peri-gPC-pinch
+Peristalsis gPC code for pinching waveform
