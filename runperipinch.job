@@ -1,38 +1,35 @@
 #!/bin/bash
-#SBATCH -p RM-shared
-#SBATCH -t 48:00:00
-#SBATCH -N 1
-#SBATCH --ntasks-per-node=8
+#SBATCH --job-name=r1to5
+#SBATCH --partition=528_queue
+#SBATCH --time=48:00:00
+#SBATCH --ntasks=8
 #SBATCH --mail-type=ALL
 
 startrun=1
 endrun=5
 
-# ARRAYNAME='runs'
-# runs=( 681 )
+# ARRAYNAME='runs'                                                              
+# runs=( 681 )                                                                  
 
-# array="${ARRAYNAME}[@]"
+# array="${ARRAYNAME}[@]"                                                       
 
-# for i in "${!array}";
+# for i in "${!array}";                                                         
 for i in `seq $startrun $endrun`;
 do
    # echo commands to stdout
-   set -x 
+   set -x
    # move to working directory
-   cd /pylon5/bi561lp/lwaldrop/peri-gPC-git/
+   cd /21dayscratch/scr/l/w/lwaldrop/peri-gPC-pinch
    # add appropriate modules
-   # module purge
-   # module load psc_path/1.1 slurm/15.08.8 git/2.10.2 intel/compilers icc/16.0.3 hdf5/1.8.16_intel 
-   # MODULEPATH=${MODULEPATH}:$HOME/modulefiles
-   # module load silo/4.10.2-intel-lw boost/1.60.0-intel-lw petsc/3.7.2-intel-lw samrai/2.4.4-intel-lw IBAMR/IBAMR-intel-lw remora/1.8-lw
-   # copy input files to LOCAL file storage
-   srun -N $SLURM_NNODES -n 1 \
-     sh `cp -r /pylon5/bi561lp/lwaldrop/peri-gPC-pinch/input.${SLURM_PROCID} $LOCAL`
-   # run MPI program
+   # module load 
+
+   # copy input files to LOCAL file storage                                        
+   # run MPI program                                                               
    mpirun -n $SLURM_NTASKS ./main2d input2d-files/input2d${i} parameters-files/parameters${i}
-   #copy output files to persistent space
-#   srun -N $SLURM_NNodes -n 1 \
-#     sh `cp -r $LOCAL/output.* /pylon2/ca4s8kp/lwaldrop/`
+   
+   # zip files for download
+   cd /21dayscratch/scr/l/w/lwaldrop/peri-gPC-pinch/runs/
    zip -r viz_IB2d${i}.zip viz_IB2d${i}/
-   rm viz_IB2d${i}/
+   zip -r hier_data_IB2d${i}.zip hier_data_IB2d${i}/
+   # rm -r viz_IB2d${i}/ hier_data_IB2d${i}/
 done
