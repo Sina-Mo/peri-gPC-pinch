@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=r1to5
-#SBATCH --partition=528_queue
+#SBATCH --partition=knl
 #SBATCH --time=48:00:00
-#SBATCH --ntasks=8
+#SBATCH --ntasks=12
 #SBATCH --mail-type=ALL
 
 startrun=1
