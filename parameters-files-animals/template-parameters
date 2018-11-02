@@ -1,0 +1,13 @@
+L1=1.0 \\
+N1=512 \\
+Let=0.4 \\
+tdiameter=0.1 \\
+tR2=0.1 \\
+pamp=0.95 \\
+freq=1.25 \\
+speed=0.3 \\
+sigma=0.0085 \\
+numPts=1720 \\
+Nendtarget=108 \\
+Nendspring=30 \\
+kappa1=70.0 \\
