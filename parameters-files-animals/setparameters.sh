@@ -2,8 +2,8 @@
 
 # Separate main parameter file into three files
 # cut -f 1 allpara.txt > Wo.txt
-cut -f 3 -d , animals-for-input2d.csv > pamp.txt
-cut -f 2 -d , animals-for-input2d.csv > Freq.txt
+cut -f 4 -d , animals-for-input2d.csv > pamp.txt
+cut -f 3 -d , animals-for-input2d.csv > Freq.txt
 
 # Count number of lines in files
 numlines=$(grep -c "^" animals-for-input2d.csv)
