@@ -17,11 +17,11 @@ do
 # Sets Wo based on i
 pamp=$(awk -v var="$i" 'NR==var' pamp.txt)
 # Writes file to replace line with Wo
-cat template-parameters |  awk -v var="$pamp" 'NR==6 {$0="pamp = "'"var"'"  \\ "} 1' template-parameters > parametersw${i}
+cat template-parameters |  awk -v var="$pamp" 'NR==6 {$0="pamp = "'"var"'" \\\\ "} 1' template-parameters > parametersw${i}
 # Sets Freq based on i
 Freq=$(awk -v var="$i" 'NR==var' Freq.txt)
 # Writes file to replace line with Freq
-cat template-parameters |  awk -v var="$Freq" 'NR==7 {$0="freq = "'"var"'"   \\"} 1' parametersw${i} > parametersw${i}f${i}
+cat template-parameters |  awk -v var="$Freq" 'NR==7 {$0="freq = "'"var"'"   \\\\"} 1' parametersw${i} > parametersw${i}f${i}
 # cat template-parameters |  awk -v var="$Freq" 'NR==8 {$0="iposn = "'"var"'"   \\"} 1' parametersw${i}f${i} > parametersw${i}f${i}l${i}
 # Cleans up folder
 # mv parametersw${i}f${i}l${i} parameters${i}
