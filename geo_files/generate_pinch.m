@@ -64,12 +64,19 @@ Nmarkers=Nmarkersx*Nmarkersy;       %total number of markers
 dmx = Let/(Nmarkersx-1);            %space between markers in x-direction
 dmy = (diameter-0.002)/(Nmarkersy-1);       %space between markers in y-direction
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Parameters for the pericardium
+Dp = 2*diameter;                    %diameter of the pericardium
+Nperi = 2*ceil((Dp-diameter)/ds);  % number of boundary points along the sides of the pericardium
+Nperitot = Nperi + Nstraight;       % total number of pericardium points
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % material parameters
 kappa_spring = 30.0;               % spring constant (Newton)
 kappa_beam_race = 2e-3;                 % beam stiffness constant (Newton m^2) %2.5e-2 works for Wo>=5
-kappa_beam_tube = 8e-2;
+kappa_beam_tube = 8e-1;
 kappa_target = 20*kappa_spring;        % target point penalty spring constant (Newton)  
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -403,5 +410,72 @@ if plotit ==1
 else
     
 end
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Pericardium
+% Write out the vertex information
+
+vertex_fid = fopen([mesh_name 'peri_' num2str(N) '.vertex'], 'w');
+fprintf(vertex_fid, '%d\n', Nperitot);
+
+% make the top and bottom of the pericardium
+for i=1:ceil(Nstraight/2),
+    ytop = centery-(R2-(Dp-diameter)/2);
+    xtop = -Lt/2+(i-1)*ds;
+    fprintf(vertex_fid, '%1.16e %1.16e\n', xtop, ytop);
+    plot(xtop,ytop)
+end
+
+for i=ceil(Nstraight/2)+1:Nstraight,
+    ybot = centery-R1-(Dp-diameter)/2;
+    xbot = -Lt/2+(i-ceil(Nstraight/2)-1)*ds;
+    fprintf(vertex_fid, '%1.16e %1.16e\n', xbot, ybot);
+    plot(xbot,ybot)
+end
+
+% make the four side pieces
+for i=Nstraight+1:Nstraight+ceil(Nperi/4),
+    y = centery-(R1+(Dp-diameter)/2)+(i-Nstraight-1)*ds;
+    x = -Lt/2;
+    fprintf(vertex_fid, '%1.16e %1.16e\n', x, y);
+    plot(x,y)
+end
+
+for i=Nstraight+ceil(Nperi/4)+1:Nstraight+ceil(Nperi/2),
+    y = centery-R2+(i-Nstraight-ceil(Nperi/4)-1)*ds;
+    x = -Lt/2;
+    fprintf(vertex_fid, '%1.16e %1.16e\n', x, y);
+    plot(x,y)
+end
+
+for i=Nstraight+ceil(Nperi/2)+1:Nstraight+ceil(3*Nperi/4),
+    y = centery-(R1+(Dp-diameter)/2)+(i-Nstraight-ceil(Nperi/2)-1)*ds;
+    x = Lt/2;
+    fprintf(vertex_fid, '%1.16e %1.16e\n', x, y);
+    plot(x,y)
+end
+
+for i=Nstraight+ceil(3*Nperi/4)+1:Nperitot,
+    y = centery-R2+(i-Nstraight-ceil(3*Nperi/4)-1)*ds;
+    x = Lt/2;
+    fprintf(vertex_fid, '%1.16e %1.16e\n', x, y);
+    plot(x,y)
+end
+fclose(vertex_fid);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Write out the target point information for the pericardium
+target_fid = fopen([mesh_name 'peri_' num2str(N) '.target'], 'w');
+
+fprintf(target_fid, '%d\n', Nperitot);
+
+for i = 0:Nperitot-1,
+    fprintf(target_fid, '%d %1.16e\n', i, kappa_target*ds/(ds^2));
+end
+
+fclose(target_fid);
+
 
 

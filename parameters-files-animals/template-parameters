@@ -10,4 +10,4 @@ sigma=0.0085 \\
 numPts=1720 \\
 Nendtarget=108 \\
 Nendspring=30 \\
-kappa1=100.0 \\
+kappa1=200.0 \\
