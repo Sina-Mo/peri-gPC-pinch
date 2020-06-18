@@ -81,15 +81,15 @@ kappa_target = 20*kappa_spring;        % target point penalty spring constant (N
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if plotit == 1 
+%if plotit == 1 
 % Initialize plotting function
-    figure(1) 
-    hold on
+    Gx=figure(1); 
+    %hold on
     ylim([-L/2 L/2])
     xlim([-L/2 L/2])
-else
+%else
     
-end
+%end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -121,24 +121,24 @@ end
 
 fclose(vertex_fid);
 
-if plotit==1
+%if plotit==1
 % Plots elastic tube vertices
     plot(xtop_elastic,ytop_elastic,'r.')
     plot(xbot_elastic,ybot_elastic,'g.')
-else 
+%else 
     
-end
+%end
 % Write out the spring information for the elastic section
 
 spring_fid = fopen([mesh_name 'tube_' num2str(n) '.spring'], 'w');
 fprintf(spring_fid, '%d\n', 2*Nstraight-2);
 
 %elastic part of tube
-for i = 0:Nstraight-2,
+for i = 0:Nstraight-2
     fprintf(spring_fid, '%d %d %1.16e %1.16e\n', i, i+1, kappa_spring*0.5*ds/((0.5*ds)^2), 0.75*ds);
 end
 
-for i = Nstraight:2*Nstraight-2,
+for i = Nstraight:2*Nstraight-2
     fprintf(spring_fid, '%d %d %1.16e %1.16e\n', i, i+1, kappa_spring*0.5*ds/((0.5*ds)^2), 0.75*ds);
 end
 
@@ -150,7 +150,7 @@ beam_fid = fopen([mesh_name 'tube_' num2str(n) '.beam'], 'w');
 fprintf(beam_fid, '%d\n', 2*Nstraight-4);
 
 %elastic part of tube
-for i = 0:Nstraight-3,
+for i = 0:Nstraight-3
    % if i>=0 && i<=10 || i<=Nstraight-3 && i>=Nstraight-13
         fprintf(beam_fid, '%d %d %d %1.16e\n', i, i+1, i+2, (1/10)*kappa_beam_tube*0.5*ds/((0.5*ds)^4));
     %else
@@ -158,7 +158,7 @@ for i = 0:Nstraight-3,
     %end
 end
 
-for i = Nstraight:2*Nstraight-3,
+for i = Nstraight:2*Nstraight-3
     %if i>=Nstraight && i<=Nstraight+10 %|| i<=2*Nstraight-3 && i>=2*Nstraight-13
         fprintf(beam_fid, '%d %d %d %1.16e\n', i, i+1, i+2, (1/10)*kappa_beam_tube*0.5*ds/((0.5*ds)^4));
     %else
@@ -196,20 +196,20 @@ vertex_fid = fopen(['markers_' num2str(n) '.vertex'], 'w');
 fprintf(vertex_fid, '%d\n', Nmarkers);
 
 % Markers
-for i=0:Nmarkersx-1,
-    for j=0:Nmarkersy-1,
+for i=0:Nmarkersx-1
+    for j=0:Nmarkersy-1
         y_mark(i+1,j+1) = centery-R2-0.001-j*dmy;
         x_mark(i+1,j+1) = -Let/2+i*dmx;
     fprintf(vertex_fid, '%1.16e %1.16e\n', x_mark(i+1,j+1), y_mark(i+1,j+1));
     end
 end
 
-if plotit==1
+%if plotit==1
 % Plot markers
     plot(x_mark,y_mark,'y.')
-else
+%else
     
-end
+%end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -224,7 +224,7 @@ vertex_fid = fopen([mesh_name 'race_' num2str(n) '.vertex'], 'w');
 fprintf(vertex_fid, '%d\n', Nrace);
 
 %right inner curved part of racetrack 
-for i=1:ceil(Ncurve/2),
+for i=1:ceil(Ncurve/2)
     theta = (i-1)*dtheta-pi/2;
     y_race(1,i) = centery+R2*sin(theta);
     x_race(1,i) = Lt/2+R2*cos(theta);
@@ -232,14 +232,14 @@ for i=1:ceil(Ncurve/2),
 end
 
 %straight inner section on the top
-for i = ceil(Ncurve/2)+1:ceil(Ncurve/2)+ceil(Nstraight/2),
+for i = ceil(Ncurve/2)+1:ceil(Ncurve/2)+ceil(Nstraight/2)
     y_race(1,i) = centery+R2;
     x_race(1,i) = centerx2-(i-ceil(Ncurve/2)-1)*ds;
     fprintf(vertex_fid, '%1.16e %1.16e\n', x_race(1,i), y_race(1,i));
 end
 
 %left inner curved part of racetrack
-for i = ceil(Ncurve/2)+ceil(Nstraight/2)+1:Ncurve+ceil(Nstraight/2),
+for i = ceil(Ncurve/2)+ceil(Nstraight/2)+1:Ncurve+ceil(Nstraight/2)
     theta = pi/2+(i-(ceil(Ncurve/2)+ceil(Nstraight/2))-1)*dtheta;
     y_race(1,i) = centery+R2*sin(theta);
     x_race(1,i) = centerx1+R2*cos(theta);
@@ -247,7 +247,7 @@ for i = ceil(Ncurve/2)+ceil(Nstraight/2)+1:Ncurve+ceil(Nstraight/2),
 end
 
 %right outer curved part of racetrack 
-for i=Ncurve+ceil(Nstraight/2)+1:Ncurve+ceil(Ncurve/2)+ceil(Nstraight/2),
+for i=Ncurve+ceil(Nstraight/2)+1:Ncurve+ceil(Ncurve/2)+ceil(Nstraight/2)
     theta=(i-(Ncurve+ceil(Nstraight/2))-1)*dtheta-pi/2;
     y_race(1,i) = centery+R1*sin(theta);
     x_race(1,i) = Lt/2+R1*cos(theta);
@@ -255,7 +255,7 @@ for i=Ncurve+ceil(Nstraight/2)+1:Ncurve+ceil(Ncurve/2)+ceil(Nstraight/2),
 end
 
 %straight outer section on the top
-for i = Ncurve+ceil(Ncurve/2)+ceil(Nstraight/2)+1:Ncurve+ceil(Ncurve/2)+Nstraight,
+for i = Ncurve+ceil(Ncurve/2)+ceil(Nstraight/2)+1:Ncurve+ceil(Ncurve/2)+Nstraight
     y_race(1,i) = centery+R1;
     x_race(1,i) = centerx2-(i-(Ncurve+ceil(Ncurve/2)+ceil(Nstraight/2))-1)*ds;
     fprintf(vertex_fid, '%1.16e %1.16e\n', x_race(1,i), y_race(1,i));
@@ -263,7 +263,7 @@ end
 
 
 %left outer curved part of racetrack
-for i = Ncurve+ceil(Ncurve/2)+Nstraight+1:2*Ncurve+Nstraight,
+for i = Ncurve+ceil(Ncurve/2)+Nstraight+1:2*Ncurve+Nstraight
     theta = pi/2+(i-(Ncurve+ceil(Ncurve/2)+Nstraight)-1)*dtheta;
     y_race(1,i) = centery+R1*sin(theta);
     x_race(1,i) = centerx1+R1*cos(theta);
@@ -283,7 +283,7 @@ target_fid = fopen([mesh_name 'race_' num2str(n) '.target'], 'w');
 
 fprintf(target_fid, '%d\n', Nrace);
 
-for i = 0:Nrace-1,
+for i = 0:Nrace-1
 %      fprintf(target_fid, '%d %1.16e\n', i, kappa_target*ds/(ds^2));
    fprintf(target_fid, '%d %1.16e %1.16e\n', i, kappa_target*ds/(ds^2), 2*rho*(dx^dim));
 end
@@ -421,14 +421,14 @@ vertex_fid = fopen([mesh_name 'peri_' num2str(N) '.vertex'], 'w');
 fprintf(vertex_fid, '%d\n', Nperitot);
 
 % make the top and bottom of the pericardium
-for i=1:ceil(Nstraight/2),
+for i=1:ceil(Nstraight/2)
     ytop = centery-(R2-(Dp-diameter)/2);
     xtop = -Lt/2+(i-1)*ds;
     fprintf(vertex_fid, '%1.16e %1.16e\n', xtop, ytop);
     plot(xtop,ytop)
 end
 
-for i=ceil(Nstraight/2)+1:Nstraight,
+for i=ceil(Nstraight/2)+1:Nstraight
     ybot = centery-R1-(Dp-diameter)/2;
     xbot = -Lt/2+(i-ceil(Nstraight/2)-1)*ds;
     fprintf(vertex_fid, '%1.16e %1.16e\n', xbot, ybot);
@@ -436,28 +436,28 @@ for i=ceil(Nstraight/2)+1:Nstraight,
 end
 
 % make the four side pieces
-for i=Nstraight+1:Nstraight+ceil(Nperi/4),
+for i=Nstraight+1:Nstraight+ceil(Nperi/4)
     y = centery-(R1+(Dp-diameter)/2)+(i-Nstraight-1)*ds;
     x = -Lt/2;
     fprintf(vertex_fid, '%1.16e %1.16e\n', x, y);
     plot(x,y)
 end
 
-for i=Nstraight+ceil(Nperi/4)+1:Nstraight+ceil(Nperi/2),
+for i=Nstraight+ceil(Nperi/4)+1:Nstraight+ceil(Nperi/2)
     y = centery-R2+(i-Nstraight-ceil(Nperi/4)-1)*ds;
     x = -Lt/2;
     fprintf(vertex_fid, '%1.16e %1.16e\n', x, y);
     plot(x,y)
 end
 
-for i=Nstraight+ceil(Nperi/2)+1:Nstraight+ceil(3*Nperi/4),
+for i=Nstraight+ceil(Nperi/2)+1:Nstraight+ceil(3*Nperi/4)
     y = centery-(R1+(Dp-diameter)/2)+(i-Nstraight-ceil(Nperi/2)-1)*ds;
     x = Lt/2;
     fprintf(vertex_fid, '%1.16e %1.16e\n', x, y);
     plot(x,y)
 end
 
-for i=Nstraight+ceil(3*Nperi/4)+1:Nperitot,
+for i=Nstraight+ceil(3*Nperi/4)+1:Nperitot
     y = centery-R2+(i-Nstraight-ceil(3*Nperi/4)-1)*ds;
     x = Lt/2;
     fprintf(vertex_fid, '%1.16e %1.16e\n', x, y);
@@ -471,11 +471,11 @@ target_fid = fopen([mesh_name 'peri_' num2str(N) '.target'], 'w');
 
 fprintf(target_fid, '%d\n', Nperitot);
 
-for i = 0:Nperitot-1,
+for i = 0:Nperitot-1
     fprintf(target_fid, '%d %1.16e\n', i, kappa_target*ds/(ds^2));
 end
 
 fclose(target_fid);
 
 
-
+set(Gx, 'renderer', 'painters');
